@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35208.52
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PtgExpressHub.Web", "PtgExpressHub.Web\PtgExpressHub.Web.csproj", "{0259995E-8BE7-4E63-9715-1F8D1B4F966D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0259995E-8BE7-4E63-9715-1F8D1B4F966D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0259995E-8BE7-4E63-9715-1F8D1B4F966D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0259995E-8BE7-4E63-9715-1F8D1B4F966D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0259995E-8BE7-4E63-9715-1F8D1B4F966D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D3C05E82-9D02-4851-B2F6-3DB38AB87F52}
+	EndGlobalSection
+EndGlobal
