@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Antiforgery
+@using PtgExpressHub.Web.Runtime
+
+@page "/auth/login"
+
+@attribute [RequireAntiforgeryToken(required: false)]
+
+@inject NavigationManager _navigation;
+@inject AuthService _authService;
+
+@rendermode @(new InteractiveServerRenderMode(prerender: true))
+
+<h3>Login</h3>
+
+<EditForm Model="@credentials" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label>Username:</label>
+        <InputText @bind-Value="credentials.Username" />
+    </div>
+    <div>
+        <label>Password:</label>
+        <InputText @bind-Value="credentials.Password" type="password" />
+    </div>
+    <button type="submit">Login</button>
+</EditForm>
+
+<p>@ErrorMessage </p>

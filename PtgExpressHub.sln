@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PtgExpressHub.Web", "PtgExpressHub.Web\PtgExpressHub.Web.csproj", "{0259995E-8BE7-4E63-9715-1F8D1B4F966D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.Web", "PtgExpressHub.Web\PtgExpressHub.Web.csproj", "{0259995E-8BE7-4E63-9715-1F8D1B4F966D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.Data", "PtgExpressHub.Domain\PtgExpressHub.Data.csproj", "{DA03BF16-7A2C-401E-BEC1-2B23A3B80A73}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PtgExpressHub.Actions", "PtgExpressHub.Actions", "{7A47AF2B-22BD-48EB-B9E9-8AAB2622AF68}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,10 @@ Global
 		{0259995E-8BE7-4E63-9715-1F8D1B4F966D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0259995E-8BE7-4E63-9715-1F8D1B4F966D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0259995E-8BE7-4E63-9715-1F8D1B4F966D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA03BF16-7A2C-401E-BEC1-2B23A3B80A73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA03BF16-7A2C-401E-BEC1-2B23A3B80A73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA03BF16-7A2C-401E-BEC1-2B23A3B80A73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA03BF16-7A2C-401E-BEC1-2B23A3B80A73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,32 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using PtgExpressHub.Web.Runtime
+
+@inject AuthService _authService;
+@inject AuthenticationStateProvider _customAuthenticationStateProvider;
+@inject NavigationManager NavigationManager;
+
+<div class="header-container">
+    <div class="header-base">
+        <img class="header-base-image" src="/network.png" />
+        <p class="header-base-label">Ptg Express Hub</p>
+    </div>    
+    @if (@_authService.IsAuthorizedAsync().Result)
+    {
+        <div class="header-user">
+            <div class="header-user-social" style="display: none">
+                <p class="header-user-social-label">автор</p>
+                <img class="header-user-social-image" src="/telegram.png" />
+            </div>
+            <input type="button" value="Выйти" class="ptg-button header-user-logout" @onclick="OnClick" />
+        </div>
+    }
+</div>
+
+@code {
+    private void OnClick(MouseEventArgs e)
+    {
+        ((CustomAuthenticationStateProvider)_customAuthenticationStateProvider).MarkUserAsLoggedOut();
+
+        NavigationManager.NavigateTo("/auth/login");
+    }
+}
