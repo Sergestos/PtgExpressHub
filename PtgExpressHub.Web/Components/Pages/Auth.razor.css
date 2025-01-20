@@ -1,0 +1,39 @@
+﻿.auth-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    border: 1px solid #ffffff;
+    border-radius: 6px;
+
+    padding: 2rem 0 0.75rem 0;
+    margin: 7.5rem 35% 0 35%;
+
+    background-color: white;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.auth-container-form {
+    margin-top: 1.5rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: row;
+    justify-content:end;
+    gap: 0.66rem;
+    margin: 0.75rem 0;
+}
+
+.login-button {
+    margin-top: 0.66rem;
+    height: 2.25rem;   
+    width: 5rem;
+}
+
+.error-message {
+    margin-top: 1.5rem;
+    margin-left: 0.5rem;
+    color: red;
+}

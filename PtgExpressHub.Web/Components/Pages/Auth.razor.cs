@@ -22,7 +22,7 @@ public partial class Auth
         }    
         else
         {
-            ErrorMessage = "Invalid username or password.";
+            ErrorMessage = "Логин или пароль введены неверно.";
         }
     }
 

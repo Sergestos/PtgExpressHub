@@ -11,20 +11,24 @@
 
 @rendermode @(new InteractiveServerRenderMode(prerender: true))
 
-<h3>Login</h3>
-
-<EditForm Model="@credentials" OnValidSubmit="HandleLogin">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div>
-        <label>Username:</label>
-        <InputText @bind-Value="credentials.Username" />
+<div class="auth-container">
+    <h3>Авторизация</h3>
+    <div class="auth-container-form">
+        <EditForm Model="@credentials" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-field">
+                <label>Логин</label>
+                <InputText style="border: 1px solid #d1d5db; border-radius: 0.375rem;" @bind-Value="credentials.Username" />
+            </div>
+            <div class="form-field">
+                <label>Пароль</label>
+                <InputText style="border: 1px solid #d1d5db; border-radius: 0.375rem;" @bind-Value="credentials.Password" type="password" />
+            </div>
+            <div class="form-field">
+                <button class="ptg-button login-button" type="submit">Войти</button>
+            </div>
+        </EditForm>
     </div>
-    <div>
-        <label>Password:</label>
-        <InputText @bind-Value="credentials.Password" type="password" />
-    </div>
-    <button type="submit">Login</button>
-</EditForm>
-
-<p>@ErrorMessage </p>
+    <p class="error-message">@ErrorMessage </p>
+</div>

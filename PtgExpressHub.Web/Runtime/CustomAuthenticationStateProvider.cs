@@ -32,7 +32,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 
     public Task MarkUserAsLoggedOut()
     {
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(null)));
         return Task.CompletedTask;
     }
 }
