@@ -4,5 +4,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PtgExpressHub.Domain\PtgExpressHub.Data.csproj" />
+  </ItemGroup>
 
 </Project>

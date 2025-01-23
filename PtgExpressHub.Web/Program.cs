@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using PtgExpressHub.Web.Components;
 using PtgExpressHub.Web.Runtime;
+using PtgExpressHub.Data;
 
 namespace PtgExpressHub.Web;
 
@@ -14,6 +15,7 @@ public class Program
             .AddInteractiveServerComponents();
 
         builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<ApplicationRepository>();
         builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
         builder.Services.AddAuthentication("CookieAuth")

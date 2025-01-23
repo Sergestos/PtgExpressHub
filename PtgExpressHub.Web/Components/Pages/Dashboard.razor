@@ -1,13 +1,43 @@
 ﻿@using Microsoft.AspNetCore.Authorization
+@using PtgExpressHub.Data
 @using PtgExpressHub.Web.Runtime
 
 @page "/"
 
-@inject AuthService AuthService;
-@inject NavigationManager NavigationManager;
+@inject AuthService _authService;
+@inject ApplicationRepository _applicationRepository;
+@inject NavigationManager _navigationManager;
+@inject IJSRuntime _jsRuntime
+
+@rendermode @(new InteractiveServerRenderMode(prerender: true))
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<div class="main-container">
+    @if (Applications != null && Applications.Count > 0)
+    {
+        @foreach (var application in Applications)
+        {
+            <div class="app-card">
+                <p class="card-title">@application.ApplicationName</p>
+                <div class="version-section">
+                    <p>Последняя версия: </p>
+                    <p>@application.ApplicationVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.Version</p>
+                </div>
+                <div class="download-section">
+                    <button class="btn-download" @onclick="async () => await DownloadFile(application)">Скачать указанную версию</button>
+                    <div class="select-container">
+                        <select class="form-select" @onchange="(e) => OnSelectChanged(application, e)">
+                            @foreach (var version in application.ApplicationVersions!.OrderByDescending(x => x.UploadDate))
+                            {
+                                <option value="@version.ApplicationVersionId">
+                                    @version.Version
+                                </option>
+                            }
+                        </select>
+                    </div>                    
+                </div>
+            </div>
+        }
+    }    
+</div>

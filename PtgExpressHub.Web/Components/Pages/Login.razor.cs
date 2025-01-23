@@ -1,6 +1,6 @@
 ﻿namespace PtgExpressHub.Web.Components.Pages;
 
-public partial class Auth
+public partial class Login
 {
     private UserCredentials credentials = new();
 
