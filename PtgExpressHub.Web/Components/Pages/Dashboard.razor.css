@@ -26,15 +26,22 @@
     color: #111827;
 }
 
-.version-section {
-    padding: 1.33rem 0 0.75rem 0;
+.version-block {
+    padding-top: 1rem;
+}
+
+.data-block {
+    padding-bottom: 1.25rem;
+}
+
+.card-data-section {
     display: flex;
-    flex-direction: row;   
+    flex-direction: row;
     gap: 0.33rem;
 }
 
-.version-section p {
-    opacity: 0.75;
+.card-data-section p {
+    opacity: 0.725;
 }
 
 .download-section {
@@ -42,7 +49,7 @@
     flex-direction: row;
     gap: 1rem;
 
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
 }
 
 .download-section .btn-download {

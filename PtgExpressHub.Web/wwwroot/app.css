@@ -3,6 +3,10 @@ html, body {
     font-family: BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+p {
+    margin-bottom: 0;
+}
+
 a, .btn-link {
     color: #006bb7;
 }

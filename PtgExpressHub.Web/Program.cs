@@ -13,9 +13,10 @@ public class Program
         
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
-
+        
+        builder.Services.AddScoped<CosmosDbContext>();
         builder.Services.AddScoped<AuthService>();
-        builder.Services.AddScoped<ApplicationRepository>();
+        builder.Services.AddScoped<IApplicationRepository, TestApplicationRepository>();
         builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
         builder.Services.AddAuthentication("CookieAuth")

@@ -1,6 +1,6 @@
 ﻿namespace PtgExpressHub.Data.Domain;
 
-public class ApplicationVersion
+public class ComportApplicationVersion
 {
     public required Guid ApplicationVersionId { get; set; }
 

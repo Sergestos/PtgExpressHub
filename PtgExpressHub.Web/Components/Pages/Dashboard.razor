@@ -4,31 +4,35 @@
 
 @page "/"
 
-@inject AuthService _authService;
-@inject ApplicationRepository _applicationRepository;
-@inject NavigationManager _navigationManager;
 @inject IJSRuntime _jsRuntime
+@inject IApplicationRepository _applicationRepository;
+@inject AuthService _authService;
+@inject NavigationManager _navigationManager;
 
 @rendermode @(new InteractiveServerRenderMode(prerender: true))
 
 <PageTitle>Home</PageTitle>
 
 <div class="main-container">
-    @if (Applications != null && Applications.Count > 0)
+    @if (ComportApplications != null && ComportApplications.Count > 0)
     {
-        @foreach (var application in Applications)
+        @foreach (var comportApplication in ComportApplications)
         {
             <div class="app-card">
-                <p class="card-title">@application.ApplicationName</p>
-                <div class="version-section">
+                <p class="card-title">@comportApplication.ApplicationName</p>
+                <div class="version-block card-data-section">
                     <p>Последняя версия: </p>
-                    <p>@application.ApplicationVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.Version</p>
+                    <p>@comportApplication.ApplicationVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.Version</p>
+                </div>
+                <div class="data-block card-data-section">
+                    <p>Последнее обновление: </p>
+                    <p>@comportApplication.ApplicationVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.UploadDate.ToString("dd/MM/yyyy")</p>
                 </div>
                 <div class="download-section">
-                    <button class="btn-download" @onclick="async () => await DownloadFile(application)">Скачать указанную версию</button>
+                    <button class="btn-download" @onclick="async () => await DownloadFile(comportApplication)">Скачать указанную версию</button>
                     <div class="select-container">
-                        <select class="form-select" @onchange="(e) => OnSelectChanged(application, e)">
-                            @foreach (var version in application.ApplicationVersions!.OrderByDescending(x => x.UploadDate))
+                        <select class="form-select" @onchange="(e) => OnSelectChanged(comportApplication, e)">
+                            @foreach (var version in comportApplication.ApplicationVersions!.OrderByDescending(x => x.UploadDate))
                             {
                                 <option value="@version.ApplicationVersionId">
                                     @version.Version

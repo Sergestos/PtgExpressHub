@@ -8,9 +8,9 @@ public partial class Dashboard
 {
     private bool isAuthenticated;
 
-    private Dictionary<Guid, ApplicationVersion> _selectedApplicationVersions = new Dictionary<Guid, ApplicationVersion>();
+    private Dictionary<Guid, ComportApplicationVersion> _selectedApplicationVersions = new Dictionary<Guid, ComportApplicationVersion>();
 
-    public IList<Application>? Applications { get; set; }
+    public IList<ComportApplication>? ComportApplications { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -22,12 +22,12 @@ public partial class Dashboard
         }
 
         var result = await _applicationRepository.GetAllApplicationsAsync(CancellationToken.None);
-        Applications = result.OrderBy(item => item.ApplicationVersions!.Max(x => x.UploadDate))
+        ComportApplications = result.OrderBy(item => item.ApplicationVersions!.Max(x => x.UploadDate))
             .Reverse()
             .ToList();
     }
 
-    public async Task DownloadFile(Application application)
+    public async Task DownloadFile(ComportApplication application)
     {
         string applicationUrl = string.Empty;
         if (_selectedApplicationVersions.ContainsKey(application.ApplicationId))
@@ -42,7 +42,7 @@ public partial class Dashboard
         await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
     }
 
-    public void OnSelectChanged(Application application, ChangeEventArgs e)
+    public void OnSelectChanged(ComportApplication application, ChangeEventArgs e)
     {
         var selectedApplicationVersionId = Guid.Parse(e.Value!.ToString()!);
         _selectedApplicationVersions[application.ApplicationId] =            
