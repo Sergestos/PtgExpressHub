@@ -1,0 +1,71 @@
+# App and Storage setup:
+# <PTG:APP-NAME> - application's name without path
+# <PTG:STORAGE-ACCOUNT> - name of starage in Azure Storage
+# <PTG:STORAGE-NAME> - name of a storage from Azure Srorage Account 
+ 
+# Azure secters setup:
+# To create tenant and rbac credentials for github action 
+# Run 'az ad sp create-for-rbac 
+#      --name "github-actions" 
+#      --role "Storage Blob Data Contributor" 
+#      --scopes "/subscriptions/$(az account show 
+#      --query id -o tsv)/resourceGroups/<AZ:RESOURCE-GROUP>/providers/Microsoft.Storage/storageAccounts/<AZ:STORAGE-ACCOUNT>"'
+# Where: 
+#   - <AZ:RESOURCE-GROUP> is a name of resource group with the Azure Storage
+#   - <AZ:STORAGE-ACCOUNT> Name of a Azure Storage Account, same as <PTG:STORAGE-ACCOUNT>
+# In resulting query fetch next secrets:
+#   - appId for secrets.AZURE_CLIENT_ID
+#   - password for secrets.AZURE_CLIENT_SECRET
+#   - tenant for secrets.AZURE_TENANT_ID
+# These secrets must be put in the Github Action Secrets 
+
+name: Build and Deploy to Azure Blob 
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - development
+      - develop
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+        
+      - name: Build Solution
+        run: msbuild <PTG:APP-NAME>.sln /p:Configuration=Release
+
+      - name: Get Application Version
+        run: |
+          $match = Select-String -Path <PTG:APP-NAME>/Properties/AssemblyInfo.cs -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+\.\d+)"\)' 
+          if ($match.Matches.Count -gt 0) {
+              $version = $match.Matches[0].Groups[1].Value
+              echo "APP_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
+          } else {
+              echo "Error: Version not found!" 
+              exit 1
+          }
+        shell: pwsh
+
+      - name: Install Azure CLI
+        run: |
+          Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile AzureCLI.msi
+          Start-Process msiexec.exe -ArgumentList '/i AzureCLI.msi /quiet /norestart' -Wait
+        shell: pwsh
+      
+      - name: Azure Login
+        run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+        shell: pwsh
+      
+      - name: Upload to Azure Storage
+        run: |
+            $folderName = "Comport882_v$env:APP_VERSION"            
+            az storage blob upload-batch --account-name <PTG:STORAGE-ACCOUNT> --account-key ${{ secrets.AZURE_STORAGE_KEY }} --destination <PTG:STORAGE-NAME>/$folderName --source <PTG:APP-NAME>/bin/Release
+        shell: pwsh

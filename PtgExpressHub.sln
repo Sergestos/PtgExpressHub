@@ -7,7 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.Web", "PtgExp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.Data", "PtgExpressHub.Domain\PtgExpressHub.Data.csproj", "{DA03BF16-7A2C-401E-BEC1-2B23A3B80A73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PtgExpressHub.ConsoleRunner", "PtgExpressHub.ConsoleRunner\PtgExpressHub.ConsoleRunner.csproj", "{56D220FC-A87E-4B95-A793-0278A5A7944B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.ConsoleRunner", "PtgExpressHub.ConsoleRunner\PtgExpressHub.ConsoleRunner.csproj", "{56D220FC-A87E-4B95-A793-0278A5A7944B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PtgExpressHub.GithubActions", "PtgExpressHub.GithubActions", "{185FF494-A7D4-4365-865E-3F408EA3D7EB}"
+	ProjectSection(SolutionItems) = preProject
+		workflow_dotnet_core.yaml = workflow_dotnet_core.yaml
+		workflow_dotnet_framework.yaml = workflow_dotnet_framework.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
