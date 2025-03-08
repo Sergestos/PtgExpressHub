@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private ClaimsPrincipal user = new ClaimsPrincipal(new ClaimsIdentity());
-
     public override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         var identity = new ClaimsIdentity(
@@ -20,7 +18,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     public void AuthenticateUser(string username)
     {
         var identity = new ClaimsIdentity(
-       [
+        [
            new Claim(ClaimTypes.Name, username),
         ], "CustomAuthentication");
 

@@ -6,7 +6,10 @@ namespace PtgExpressHub.StorageFunction;
 public class ArtifactsUploadFunction
 {
     [FunctionName("on-artifacts-uploaded-function")]
-    public static void Run2([BlobTrigger("comport-application-blob/{name}", Connection = "AzureWebJobsStorage")] Stream myBlob, string name, ILogger log)
+    public static void OnActifactsUploadedFunction(
+        [BlobTrigger("comport-application-blob/{name}", Connection = "AzureWebJobsStorage")] Stream myBlob,
+        string name, 
+        ILogger log)
     {
         log.LogInformation("C# BlobTrigger function processed a request.");
 
