@@ -66,6 +66,8 @@ jobs:
       
       - name: Upload to Azure Storage
         run: |
-            $folderName = "Comport882_v$env:APP_VERSION"            
-            az storage blob upload-batch --account-name <PTG:STORAGE-ACCOUNT> --account-key ${{ secrets.AZURE_STORAGE_KEY }} --destination <PTG:STORAGE-NAME>/$folderName --source <PTG:APP-NAME>/bin/Release
+            $folderName = "<PTG:APP-NAME>$(New-Guid)"            
+            $result = az storage blob upload-batch --account-name <PTG:STORAGE-ACCOUNT> --account-key ${{ secrets.AZURE_STORAGE_KEY }} --destination <PTG:STORAGE-NAME>/$folderName --source <PTG:APP-NAME>/bin/Release
+            Write-Host "Upload Result: $result"
+            Write-Host "Uploaded to folder: $folderName"
         shell: pwsh

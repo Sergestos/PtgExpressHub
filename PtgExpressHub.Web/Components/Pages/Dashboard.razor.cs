@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using PtgExpressHub.Data.Domain;
+using PtgExpressHub.Domain.Entities;
 
 namespace PtgExpressHub.Web.Components.Pages;
 
@@ -8,9 +8,9 @@ public partial class Dashboard
 {
     private bool isAuthenticated;
 
-    private Dictionary<Guid, ComportApplicationVersion> _selectedApplicationVersions = new Dictionary<Guid, ComportApplicationVersion>();
+    private Dictionary<Guid, ApplicationBuildVersion> _selectedApplicationVersions = new Dictionary<Guid, ApplicationBuildVersion>();
 
-    public IList<ComportApplication>? ComportApplications { get; set; }
+    public IList<ApplicationBuild>? ComportApplications { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -21,19 +21,19 @@ public partial class Dashboard
             _navigationManager.NavigateTo("/auth/login");
         }
 
-        var result = await _applicationRepository.GetAllApplicationsAsync(CancellationToken.None);
-        ComportApplications = result.OrderBy(item => item.ApplicationVersions!.Max(x => x.UploadDate))
+        var result = await _applicationRepository.GetAllApplicationsBuildAsync(CancellationToken.None);
+        ComportApplications = result.OrderBy(item => item.ApplicationBuildVersions!.Max(x => x.UploadDate))
             .Reverse()
             .ToList();
     }
 
-    public async Task DownloadFile(ComportApplication application)
+    public async Task DownloadFile(ApplicationBuild application)
     {
         string applicationUrl = string.Empty;
-        if (_selectedApplicationVersions.ContainsKey(application.ApplicationId))
-            applicationUrl = _selectedApplicationVersions[application.ApplicationId].BlobUrl;
+        if (_selectedApplicationVersions.ContainsKey(application.ApplicationBuildId))
+            applicationUrl = _selectedApplicationVersions[application.ApplicationBuildId].BlobUrl;
         else
-            applicationUrl = application.ApplicationVersions!.OrderByDescending(x => x.UploadDate).First()!.BlobUrl;
+            applicationUrl = application.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).First()!.BlobUrl;
 
         Stream fileStream = new MemoryStream([0, 1]);
         var fileName = "application.txt";
@@ -42,10 +42,10 @@ public partial class Dashboard
         await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
     }
 
-    public void OnSelectChanged(ComportApplication application, ChangeEventArgs e)
+    public void OnSelectChanged(ApplicationBuild application, ChangeEventArgs e)
     {
         var selectedApplicationVersionId = Guid.Parse(e.Value!.ToString()!);
-        _selectedApplicationVersions[application.ApplicationId] =            
-            application.ApplicationVersions!.First(x => x.ApplicationVersionId == selectedApplicationVersionId);
+        _selectedApplicationVersions[application.ApplicationBuildId] =            
+            application.ApplicationBuildVersions!.First(x => x.ApplicationVersionId == selectedApplicationVersionId);
     }
 }

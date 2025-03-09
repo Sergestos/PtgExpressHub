@@ -1,10 +1,12 @@
-﻿using PtgExpressHub.Data.Domain;
+﻿using PtgExpressHub.Domain.Entities;
 
-namespace PtgExpressHub.Data;
+namespace PtgExpressHub.Domain;
 
 public interface IApplicationRepository
 {
-    Task<IList<ComportApplication>> GetAllApplicationsAsync(CancellationToken cancellation);
+    Task<IList<ApplicationBuild>> GetAllApplicationsBuildAsync(CancellationToken cancellation);
 
-    Task CreateApplicationAsync(ComportApplication application, CancellationToken cancellation);
+    Task<ApplicationBuild> GetApplicationsBuildByProductNameAsync(string productName, CancellationToken cancellation);
+
+    Task CreateApplicationBuildAsync(ApplicationBuild applicationBuild, CancellationToken cancellation);
 }

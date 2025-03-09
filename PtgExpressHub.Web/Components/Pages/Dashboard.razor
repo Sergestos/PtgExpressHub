@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Authorization
-@using PtgExpressHub.Data
+@using PtgExpressHub.Domain
 @using PtgExpressHub.Web.Runtime
 
 @page "/"
@@ -19,20 +19,20 @@
         @foreach (var comportApplication in ComportApplications)
         {
             <div class="app-card">
-                <p class="card-title">@comportApplication.ApplicationName</p>
+                <p class="card-title">@comportApplication.ApplicationBuildProductName</p>
                 <div class="version-block card-data-section">
                     <p>Последняя версия: </p>
-                    <p>@comportApplication.ApplicationVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.Version</p>
+                    <p>@comportApplication.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.Version</p>
                 </div>
                 <div class="data-block card-data-section">
                     <p>Последнее обновление: </p>
-                    <p>@comportApplication.ApplicationVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.UploadDate.ToString("dd/MM/yyyy")</p>
+                    <p>@comportApplication.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.UploadDate.ToString("dd/MM/yyyy")</p>
                 </div>
                 <div class="download-section">
                     <button class="btn-download" @onclick="async () => await DownloadFile(comportApplication)">Скачать указанную версию</button>
                     <div class="select-container">
                         <select class="form-select" @onchange="(e) => OnSelectChanged(comportApplication, e)">
-                            @foreach (var version in comportApplication.ApplicationVersions!.OrderByDescending(x => x.UploadDate))
+                            @foreach (var version in comportApplication.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate))
                             {
                                 <option value="@version.ApplicationVersionId">
                                     @version.Version

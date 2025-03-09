@@ -16,6 +16,9 @@
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="5.3.3" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PtgExpressHub.Domain\PtgExpressHub.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

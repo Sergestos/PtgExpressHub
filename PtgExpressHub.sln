@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.Web", "PtgExpressHub.Web\PtgExpressHub.Web.csproj", "{0259995E-8BE7-4E63-9715-1F8D1B4F966D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.Data", "PtgExpressHub.Domain\PtgExpressHub.Data.csproj", "{DA03BF16-7A2C-401E-BEC1-2B23A3B80A73}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.Domain", "PtgExpressHub.Domain\PtgExpressHub.Domain.csproj", "{DA03BF16-7A2C-401E-BEC1-2B23A3B80A73}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PtgExpressHub.GithubActions", "PtgExpressHub.GithubActions", "{185FF494-A7D4-4365-865E-3F408EA3D7EB}"
 	ProjectSection(SolutionItems) = preProject
@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PtgExpressHub.GithubActions
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.StorageFunction", "PtgExpressHub.StorageFunction\PtgExpressHub.StorageFunction.csproj", "{B2BDAE4D-CE0E-498E-B5EC-6DDD4A3E016E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PtgExpressHub.Domain.Data", "PtgExpressHub.Domain.Data\PtgExpressHub.Domain.Data.csproj", "{B9FEFAE9-8BEE-47EE-8A4E-7E14C83D0B2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{B2BDAE4D-CE0E-498E-B5EC-6DDD4A3E016E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2BDAE4D-CE0E-498E-B5EC-6DDD4A3E016E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2BDAE4D-CE0E-498E-B5EC-6DDD4A3E016E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9FEFAE9-8BEE-47EE-8A4E-7E14C83D0B2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9FEFAE9-8BEE-47EE-8A4E-7E14C83D0B2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9FEFAE9-8BEE-47EE-8A4E-7E14C83D0B2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9FEFAE9-8BEE-47EE-8A4E-7E14C83D0B2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

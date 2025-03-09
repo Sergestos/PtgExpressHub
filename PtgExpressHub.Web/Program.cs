@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using PtgExpressHub.Web.Components;
 using PtgExpressHub.Web.Runtime;
-using PtgExpressHub.Data;
+using PtgExpressHub.Domain;
 
 namespace PtgExpressHub.Web;
 
@@ -14,7 +14,6 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
         
-        builder.Services.AddScoped<CosmosDbContext>();
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<IApplicationRepository, TestApplicationRepository>();
         builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();

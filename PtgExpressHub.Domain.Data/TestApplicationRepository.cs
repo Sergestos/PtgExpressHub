@@ -1,17 +1,18 @@
-﻿using PtgExpressHub.Data.Domain;
+﻿using PtgExpressHub.Domain;
+using PtgExpressHub.Domain.Entities;
 
-namespace PtgExpressHub.Data;
+namespace PtgExpressHub.Domain;
 
 public class TestApplicationRepository : IApplicationRepository
 {
-    public Task CreateApplicationAsync(ComportApplication application, CancellationToken cancellation)
+    public Task CreateApplicationBuildAsync(ApplicationBuild application, CancellationToken cancellation)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IList<ComportApplication>> GetAllApplicationsAsync(CancellationToken cancellation)
+    public Task<IList<ApplicationBuild>> GetAllApplicationsBuildAsync(CancellationToken cancellation)
     {
-        IList<ComportApplication> applications = [
+        IList<ApplicationBuild> applications = [
             GenerateApplication("Comport213"), 
             GenerateApplication("Comport923"),
             GenerateApplication("Comport113"),
@@ -24,16 +25,23 @@ public class TestApplicationRepository : IApplicationRepository
         return Task.FromResult(applications);
     }
 
-    private ComportApplication GenerateApplication(string name, DateTime? dateTime = null)
+    public Task<ApplicationBuild> GetApplicationsBuildByProductNameAsync(string productName, CancellationToken cancellation)
+    {
+        throw new NotImplementedException();
+    }
+
+    private ApplicationBuild GenerateApplication(string name, DateTime? dateTime = null)
     {
         var guid = Guid.NewGuid();
-        var application = new ComportApplication()
+        var application = new ApplicationBuild()
         {
-            ApplicationId = guid,
-            ApplicationName = name,
-            ApplicationVersions = new List<ComportApplicationVersion>()
+            ApplicationBuildId = guid,
+            ApplicationRepositoryUrl = "url://github",
+            ApplicationBuildProductName = name,
+            ApplicationBuildUserName = "Product" + name.Skip(7),
+            ApplicationBuildVersions = new List<ApplicationBuildVersion>()
             {
-                new ComportApplicationVersion()
+                new ApplicationBuildVersion()
                 {
                     ApplicationId = guid,
                     ApplicationVersionId = Guid.NewGuid(),
@@ -41,7 +49,7 @@ public class TestApplicationRepository : IApplicationRepository
                     Version = "1.0.0",
                     UploadDate = dateTime != null ? dateTime.Value.AddDays(-1) : DateTime.Now.AddDays(-1),
                 },
-                new ComportApplicationVersion()
+                new ApplicationBuildVersion()
                 {
                     ApplicationId = guid,
                     ApplicationVersionId = Guid.NewGuid(),
