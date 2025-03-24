@@ -36,7 +36,7 @@ public class ArtifactUploadFunction
         if (requestData == null)        
             return BuildResponse(request, HttpStatusCode.BadRequest, "Request data was not deserialized correctly.");        
 
-        var applicationBuild = await _applicationRepository.GetApplicationsBuildByProductNameAsync(requestData.ApplicationBuildName, cancellationToken);
+        var applicationBuild = await _applicationRepository.GetApplicationsBuildByProductionNameAsync(requestData.ApplicationBuildName, cancellationToken);
         if (applicationBuild == null)
         {
 
@@ -45,7 +45,7 @@ public class ArtifactUploadFunction
         ApplicationBuild build = new ApplicationBuild()
         {
             ApplicationBuildId = Guid.NewGuid(),
-            ApplicationBuildProductName = requestData.ApplicationBuildName,
+            ApplicationBuildProductionName = requestData.ApplicationBuildName,
             ApplicationBuildUserName = requestData.ApplicationBuildName,
             ApplicationRepositoryUrl = requestData.RepositoryUrl,
         };

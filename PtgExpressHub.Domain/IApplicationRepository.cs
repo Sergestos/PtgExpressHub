@@ -6,7 +6,9 @@ public interface IApplicationRepository
 {
     Task<IList<ApplicationBuild>> GetAllApplicationsBuildAsync(CancellationToken cancellation);
 
-    Task<ApplicationBuild> GetApplicationsBuildByProductNameAsync(string productName, CancellationToken cancellation);
+    Task<ApplicationBuild?> GetApplicationsBuildByProductionNameAsync(string productionName, CancellationToken cancellation);
 
-    Task CreateApplicationBuildAsync(ApplicationBuild applicationBuild, CancellationToken cancellation);
+    Task<ApplicationBuild> CreateApplicationBuildAsync(ApplicationBuild applicationBuild, CancellationToken cancellation);
+
+    Task<ApplicationBuildVersion> CreateApplicationBuildVersionAsync(Guid buildId, ApplicationBuildVersion applicationBuildVersion, CancellationToken cancellation);
 }

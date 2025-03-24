@@ -17,7 +17,7 @@ public class PtgExpressDataContext : DbContext
         modelBuilder.Entity<ApplicationBuild>()
             .HasKey(b => b.ApplicationBuildId);
         modelBuilder.Entity<ApplicationBuild>()
-            .Property(b => b.ApplicationBuildProductName)
+            .Property(b => b.ApplicationBuildProductionName)
             .HasMaxLength(128)
             .IsRequired();
         modelBuilder.Entity<ApplicationBuild>()

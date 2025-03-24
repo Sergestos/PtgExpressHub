@@ -19,7 +19,7 @@
         @foreach (var comportApplication in ComportApplications)
         {
             <div class="app-card">
-                <p class="card-title">@comportApplication.ApplicationBuildProductName</p>
+                <p class="card-title">@comportApplication.ApplicationBuildProductionName</p>
                 <div class="version-block card-data-section">
                     <p>Последняя версия: </p>
                     <p>@comportApplication.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.Version</p>

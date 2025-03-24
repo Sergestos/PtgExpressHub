@@ -10,6 +10,11 @@ public class TestApplicationRepository : IApplicationRepository
         throw new NotImplementedException();
     }
 
+    public Task<ApplicationBuildVersion> CreateApplicationBuildVersionAsync(Guid buildId, ApplicationBuildVersion applicationBuildVersion, CancellationToken cancellation)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<IList<ApplicationBuild>> GetAllApplicationsBuildAsync(CancellationToken cancellation)
     {
         IList<ApplicationBuild> applications = [
@@ -25,7 +30,12 @@ public class TestApplicationRepository : IApplicationRepository
         return Task.FromResult(applications);
     }
 
-    public Task<ApplicationBuild> GetApplicationsBuildByProductNameAsync(string productName, CancellationToken cancellation)
+    public Task<ApplicationBuild> GetApplicationsBuildByProductionNameAsync(string productName, CancellationToken cancellation)
+    {
+        throw new NotImplementedException();
+    }
+
+    Task<ApplicationBuild> IApplicationRepository.CreateApplicationBuildAsync(ApplicationBuild applicationBuild, CancellationToken cancellation)
     {
         throw new NotImplementedException();
     }
@@ -37,7 +47,7 @@ public class TestApplicationRepository : IApplicationRepository
         {
             ApplicationBuildId = guid,
             ApplicationRepositoryUrl = "url://github",
-            ApplicationBuildProductName = name,
+            ApplicationBuildProductionName = name,
             ApplicationBuildUserName = "Product" + name.Skip(7),
             ApplicationBuildVersions = new List<ApplicationBuildVersion>()
             {

@@ -8,7 +8,7 @@ public class ApplicationBuild
     public required Guid ApplicationBuildId { get; set; }
 
     [Required]
-    public required string ApplicationBuildProductName { get; set; }
+    public required string ApplicationBuildProductionName { get; set; }
 
     [Required]
     public required string ApplicationBuildUserName { get; set; }

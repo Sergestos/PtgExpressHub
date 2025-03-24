@@ -1,40 +1,51 @@
-﻿//using Microsoft.Azure.Cosmos;
-//using Microsoft.Azure.Cosmos.Linq;
-//using PtgExpressHub.Domain.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using PtgExpressHub.Domain.Entities;
 
-//namespace PtgExpressHub.Domain;
+namespace PtgExpressHub.Domain;
 
-//public class ApplicationBuildRepository : IApplicationRepository
-//{
-//    private CosmosDbContext _dbContext;
+public class ApplicationBuildRepository : IApplicationRepository
+{
+    private PtgExpressDataContext _dbContext;
 
-//    public ApplicationBuildRepository(CosmosDbContext dbContext)
-//    {
-//        _dbContext = dbContext;
-//    }
+    public ApplicationBuildRepository(PtgExpressDataContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
 
-//    public async Task CreateApplicationBuildAsync(ApplicationBuild applicationBuild, CancellationToken cancellationToken)
-//    {
-//        PartitionKey partitionKey = new PartitionKey(applicationBuild.ApplicationBuildProductName);
-//        ItemResponse<ApplicationBuild> response = await _dbContext.GetContainer().CreateItemAsync(applicationBuild, partitionKey, null, cancellationToken);
-//    }
+    public async Task<ApplicationBuild> CreateApplicationBuildAsync(ApplicationBuild applicationBuild, CancellationToken cancellationToken)
+    {
+        var result = _dbContext.ApplicationBuilds.Add(applicationBuild);
 
-//    public async Task<IList<ApplicationBuild>> GetAllApplicationsBuildAsync(CancellationToken cancellation)
-//    {
-//        IOrderedQueryable<ApplicationBuild> queryable = _dbContext.GetContainer().GetItemLinqQueryable<ApplicationBuild>();
-//        using FeedIterator<ApplicationBuild> linqFeed = queryable.ToFeedIterator();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-//        var result = new List<ApplicationBuild>();
-//        while (linqFeed.HasMoreResults)
-//        {
-//            FeedResponse<ApplicationBuild> response = await linqFeed.ReadNextAsync();
-            
-//            foreach (var item in response)
-//            {
-//                result.Add(item);
-//            }
-//        }
+        return result.Entity;
+    }
 
-//        return result;
-//    }
-//}
+    public async Task<ApplicationBuildVersion> CreateApplicationBuildVersionAsync(Guid buildId, ApplicationBuildVersion applicationBuildVersion, CancellationToken cancellationToken)
+    {
+        var applicationBuild = _dbContext.ApplicationBuilds.FirstOrDefault(x => x.ApplicationBuildId == buildId);
+        if (applicationBuild == null)
+            throw new InvalidOperationException("ApplicationBuild with provided Id is not found");
+
+        if (applicationBuild.ApplicationBuildVersions == null)
+            applicationBuild.ApplicationBuildVersions = new List<ApplicationBuildVersion>();
+        applicationBuild.ApplicationBuildVersions.Add(applicationBuildVersion);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return applicationBuildVersion;
+    }
+
+    public async Task<IList<ApplicationBuild>> GetAllApplicationsBuildAsync(CancellationToken cancellationToken)
+    {
+        return await _dbContext.ApplicationBuilds
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<ApplicationBuild?> GetApplicationsBuildByProductionNameAsync(string productionName, CancellationToken cancellationToken)
+    {
+        return await _dbContext.ApplicationBuilds!
+            .FirstOrDefaultAsync(x => x.ApplicationBuildProductionName == productionName, cancellationToken);
+    }
+}
