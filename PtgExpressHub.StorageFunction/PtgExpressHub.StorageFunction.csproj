@@ -5,6 +5,7 @@
     <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>7279d8bb-c58e-468f-883f-ca5137e1121d</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.20.0" />
@@ -14,8 +15,11 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.0.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.41" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="5.3.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PtgExpressHub.Domain.Data\PtgExpressHub.Domain.Data.csproj" />
     <ProjectReference Include="..\PtgExpressHub.Domain\PtgExpressHub.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>

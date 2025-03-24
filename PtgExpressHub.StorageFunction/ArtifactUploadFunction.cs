@@ -12,6 +12,7 @@ public class ArtifactUploadFunction
 {
     private readonly ILogger _logger;
     private readonly IApplicationRepository _applicationRepository;
+
     private readonly JsonSerializerOptions options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
     public ArtifactUploadFunction(ILoggerFactory loggerFactory, IApplicationRepository applicationRepository)
@@ -36,21 +37,31 @@ public class ArtifactUploadFunction
         if (requestData == null)        
             return BuildResponse(request, HttpStatusCode.BadRequest, "Request data was not deserialized correctly.");        
 
-        var applicationBuild = await _applicationRepository.GetApplicationsBuildByProductionNameAsync(requestData.ApplicationBuildName, cancellationToken);
+        var applicationBuild = await _applicationRepository.GetApplicationsBuildByProductionNameAsync(requestData.ApplicationBuildProductionName, cancellationToken);
         if (applicationBuild == null)
         {
+            var build = new ApplicationBuild()
+            {
+                ApplicationBuildId = Guid.NewGuid(),
+                ApplicationBuildProductionName = requestData.ApplicationBuildProductionName,
+                ApplicationBuildUserName = requestData.ApplicationBuildProductionName,
+                ApplicationRepositoryUrl = requestData.RepositoryUrl,
+            };
 
+            applicationBuild = await _applicationRepository.CreateApplicationBuildAsync(build, cancellationToken);
         }
 
-        ApplicationBuild build = new ApplicationBuild()
+        var applicationBuildVersion = new ApplicationBuildVersion()
         {
-            ApplicationBuildId = Guid.NewGuid(),
-            ApplicationBuildProductionName = requestData.ApplicationBuildName,
-            ApplicationBuildUserName = requestData.ApplicationBuildName,
-            ApplicationRepositoryUrl = requestData.RepositoryUrl,
+            ApplicationVersionId = Guid.NewGuid(),
+            BlobUrl = requestData.ApplicationBuildBlobPath,
+            ChangeLog = requestData.ChangeLog,
+            UploadDate = DateTime.UtcNow,
+            ApplicationBuild = applicationBuild,
+            Version = requestData.Version
         };
 
-        await _applicationRepository.CreateApplicationBuildAsync(null, cancellationToken);
+        await _applicationRepository.CreateApplicationBuildVersionAsync(applicationBuild.ApplicationBuildId, applicationBuildVersion, cancellationToken);
 
         return BuildResponse(request, HttpStatusCode.BadRequest, "Request has been completed successfully.");
     }

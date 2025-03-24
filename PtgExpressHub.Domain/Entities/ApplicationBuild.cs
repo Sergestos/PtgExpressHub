@@ -16,6 +16,5 @@ public class ApplicationBuild
     [Required]
     public required string ApplicationRepositoryUrl { get; set; }
 
-    [Required]
-    public IList<ApplicationBuildVersion>? ApplicationBuildVersions { get; set; }
+    public virtual ICollection<ApplicationBuildVersion>? ApplicationBuildVersions { get; set; }
 }

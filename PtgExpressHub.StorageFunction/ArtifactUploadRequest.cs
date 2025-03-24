@@ -2,9 +2,9 @@
 
 internal class ArtifactUploadRequest
 {
-    public required string ApplicationBuildName { get; set; }
+    public required string ApplicationBuildProductionName { get; set; }
 
-    public required string ApplicationBuildPath { get; set; }
+    public required string ApplicationBuildBlobPath { get; set; }
 
     public required string Version { get; set; }
 

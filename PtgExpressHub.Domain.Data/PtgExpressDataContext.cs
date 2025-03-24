@@ -13,7 +13,8 @@ public class PtgExpressDataContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<ApplicationBuild>().ToTable("ApplicationBuilds");
+        modelBuilder.Entity<ApplicationBuild>()
+            .ToTable("ApplicationBuilds");
         modelBuilder.Entity<ApplicationBuild>()
             .HasKey(b => b.ApplicationBuildId);
         modelBuilder.Entity<ApplicationBuild>()
@@ -31,9 +32,10 @@ public class PtgExpressDataContext : DbContext
         modelBuilder.Entity<ApplicationBuild>()
             .HasMany(b => b.ApplicationBuildVersions)
             .WithOne(p => p.ApplicationBuild)
-            .HasForeignKey(b => b.ApplicationId);
+            .HasForeignKey(b => b.ApplicationBuildId);
 
-        modelBuilder.Entity<ApplicationBuildVersion>().ToTable("ApplicationBuildVersions");
+        modelBuilder.Entity<ApplicationBuildVersion>()
+            .ToTable("ApplicationBuildVersions");
         modelBuilder.Entity<ApplicationBuildVersion>()
             .HasKey(b => b.ApplicationVersionId);
         modelBuilder.Entity<ApplicationBuildVersion>()
@@ -54,7 +56,7 @@ public class PtgExpressDataContext : DbContext
         modelBuilder.Entity<ApplicationBuildVersion>()
             .HasOne(b => b.ApplicationBuild)
             .WithMany(p => p.ApplicationBuildVersions)
-            .HasForeignKey(b => b.ApplicationId)
+            .HasForeignKey(b => b.ApplicationBuildId)
             .IsRequired();
     }
 }

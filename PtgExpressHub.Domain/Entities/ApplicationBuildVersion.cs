@@ -7,9 +7,9 @@ public class ApplicationBuildVersion
     [Key]
     public required Guid ApplicationVersionId { get; set; }    
 
-    public required Guid ApplicationId { get; set; }
+    public Guid? ApplicationBuildId { get; set; }
 
-    public required ApplicationBuild ApplicationBuild { get; set; }
+    public virtual ApplicationBuild? ApplicationBuild { get; set; }
 
     [Required]
     public required DateTime UploadDate { get; set; }
