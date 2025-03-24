@@ -10,4 +10,8 @@
     <ProjectReference Include="..\PtgExpressHub.Domain\PtgExpressHub.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />
+  </ItemGroup>
+
 </Project>

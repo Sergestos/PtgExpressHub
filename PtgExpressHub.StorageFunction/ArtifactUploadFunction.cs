@@ -33,12 +33,14 @@ public class ArtifactUploadFunction
     private async Task<HttpResponseData> HandleArtifactUploadAsync(HttpRequestData request, CancellationToken cancellationToken)
     {        
         var requestData = await JsonSerializer.DeserializeAsync<ArtifactUploadRequest>(request.Body, options);
-        if (requestData == null)
-        {
-            return BuildResponse(request, HttpStatusCode.BadRequest, "Request data was not deserialized correctly.");
-        }
+        if (requestData == null)        
+            return BuildResponse(request, HttpStatusCode.BadRequest, "Request data was not deserialized correctly.");        
 
-        //await _applicationRepository.
+        var applicationBuild = await _applicationRepository.GetApplicationsBuildByProductNameAsync(requestData.ApplicationBuildName, cancellationToken);
+        if (applicationBuild == null)
+        {
+
+        }
 
         ApplicationBuild build = new ApplicationBuild()
         {

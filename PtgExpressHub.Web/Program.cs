@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using PtgExpressHub.Web.Components;
 using PtgExpressHub.Web.Runtime;
 using PtgExpressHub.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace PtgExpressHub.Web;
 
@@ -13,7 +14,10 @@ public class Program
         
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
-        
+
+        builder.Services.AddDbContext<PtgExpressDataContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("CloudConnection")));
+
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<IApplicationRepository, TestApplicationRepository>();
         builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();

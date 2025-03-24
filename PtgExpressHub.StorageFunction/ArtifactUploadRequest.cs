@@ -6,7 +6,7 @@ internal class ArtifactUploadRequest
 
     public required string ApplicationBuildPath { get; set; }
 
-    public string? Comment { get; set; }
+    public string? ChangeLog { get; set; }
 
     public required string Version { get; set; }
 

@@ -43,6 +43,7 @@ public class TestApplicationRepository : IApplicationRepository
             {
                 new ApplicationBuildVersion()
                 {
+                    ApplicationBuild = null,
                     ApplicationId = guid,
                     ApplicationVersionId = Guid.NewGuid(),
                     BlobUrl = "url://blob",
@@ -51,6 +52,7 @@ public class TestApplicationRepository : IApplicationRepository
                 },
                 new ApplicationBuildVersion()
                 {
+                    ApplicationBuild = null,
                     ApplicationId = guid,
                     ApplicationVersionId = Guid.NewGuid(),
                     BlobUrl = "url://blob",
