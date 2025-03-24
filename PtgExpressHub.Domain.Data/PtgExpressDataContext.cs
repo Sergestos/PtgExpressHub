@@ -40,7 +40,7 @@ public class PtgExpressDataContext : DbContext
             .HasKey(b => b.ApplicationVersionId);
         modelBuilder.Entity<ApplicationBuildVersion>()
             .Property(b => b.ChangeLog)
-            .HasMaxLength(512)
+            .HasMaxLength(2048)
             .IsRequired();
         modelBuilder.Entity<ApplicationBuildVersion>()
             .Property(b => b.BlobUrl)

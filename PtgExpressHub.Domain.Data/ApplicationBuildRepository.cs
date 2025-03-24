@@ -27,9 +27,7 @@ public class ApplicationBuildRepository : IApplicationRepository
         if (applicationBuild == null)
             throw new InvalidOperationException("ApplicationBuild with provided Id is not found");
 
-        if (applicationBuild.ApplicationBuildVersions == null)
-            applicationBuild.ApplicationBuildVersions = new List<ApplicationBuildVersion>();
-        applicationBuild.ApplicationBuildVersions.Add(applicationBuildVersion);
+        _dbContext.ApplicationBuildVersions.Add(applicationBuildVersion);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
