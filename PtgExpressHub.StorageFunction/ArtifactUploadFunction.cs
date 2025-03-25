@@ -35,8 +35,9 @@ public class ArtifactUploadFunction
     {        
         var requestData = await JsonSerializer.DeserializeAsync<ArtifactUploadRequest>(request.Body, options);
         if (requestData == null)        
-            return BuildResponse(request, HttpStatusCode.BadRequest, "Request data was not deserialized correctly.");        
+            return BuildResponse(request, HttpStatusCode.BadRequest, "Request data was not deserialized correctly.");
 
+        string? lastVersion = null;
         var applicationBuild = await _applicationRepository.GetApplicationsBuildByProductionNameAsync(requestData.ApplicationBuildProductionName, cancellationToken);
         if (applicationBuild == null)
         {
@@ -46,9 +47,13 @@ public class ArtifactUploadFunction
                 ApplicationBuildProductionName = requestData.ApplicationBuildProductionName,
                 ApplicationBuildUserName = requestData.ApplicationBuildProductionName,
                 ApplicationRepositoryUrl = requestData.RepositoryUrl,
-            };
+            }; 
 
             applicationBuild = await _applicationRepository.CreateApplicationBuildAsync(build, cancellationToken);
+        }
+        else
+        {
+            lastVersion = applicationBuild.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).First().Version;
         }
 
         var applicationBuildVersion = new ApplicationBuildVersion()
@@ -58,12 +63,32 @@ public class ArtifactUploadFunction
             ChangeLog = requestData.ChangeLog,
             UploadDate = DateTime.UtcNow,
             ApplicationBuild = applicationBuild,
-            Version = requestData.Version
+            Version = IncrementVersion(requestData.Version, lastVersion)
         };
 
         await _applicationRepository.CreateApplicationBuildVersionAsync(applicationBuild.ApplicationBuildId, applicationBuildVersion, cancellationToken);
 
-        return BuildResponse(request, HttpStatusCode.BadRequest, "Request has been completed successfully.");
+        return BuildResponse(request, HttpStatusCode.OK, "Request has been completed successfully.");
+    }
+
+    private string IncrementVersion(string newVersion, string? lastVersion)
+    {
+        if (lastVersion == null)
+            return newVersion;
+
+        BuildVersion lastBuildVersion = BuildVersion.Parse(lastVersion);
+        BuildVersion newBuildVersion = BuildVersion.Parse(newVersion);
+
+        if (lastBuildVersion.Major == newBuildVersion.Major && lastBuildVersion.Minor == newBuildVersion.Minor)
+            return lastBuildVersion.IncrementPatch().ToString();
+
+        if (lastBuildVersion.Major == newBuildVersion.Major && lastBuildVersion.Minor != newBuildVersion.Minor)
+            return lastBuildVersion.IncrementMinor().ToString();
+
+        if (lastBuildVersion.Major != newBuildVersion.Major)
+            return lastBuildVersion.IncrementMajor().ToString();
+
+        return lastVersion;
     }
 
     private HttpResponseData BuildResponse(HttpRequestData request, HttpStatusCode httpStatusCode, string message)

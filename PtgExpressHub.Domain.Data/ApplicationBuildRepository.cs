@@ -44,6 +44,7 @@ public class ApplicationBuildRepository : IApplicationRepository
     public async Task<ApplicationBuild?> GetApplicationsBuildByProductionNameAsync(string productionName, CancellationToken cancellationToken)
     {
         return await _dbContext.ApplicationBuilds!
+            .Include(x => x.ApplicationBuildVersions)
             .FirstOrDefaultAsync(x => x.ApplicationBuildProductionName == productionName, cancellationToken);
     }
 }
