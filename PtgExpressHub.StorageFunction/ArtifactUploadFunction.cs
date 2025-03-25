@@ -45,7 +45,7 @@ public class ArtifactUploadFunction
             {
                 ApplicationBuildId = Guid.NewGuid(),
                 ApplicationBuildProductionName = requestData.ApplicationBuildProductionName,
-                ApplicationBuildUserName = requestData.ApplicationBuildProductionName,
+                ApplicationBuildUserName = requestData.ApplicationBuildUserName,
                 ApplicationRepositoryUrl = requestData.RepositoryUrl,
             }; 
 
