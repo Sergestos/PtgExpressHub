@@ -1,0 +1,24 @@
+﻿<div style="min-width: 420px;min-height: 150px;display: flex;flex-direction: column;justify-content: space-between;" 
+    @onclick:stopPropagation>
+    <p style="font-weight: 600; margin-bottom: 10px;">Список изменений</p>
+    @if (@TextRows != null && @TextRows.Any())
+    {
+        <div style="margin-bottom: 30px;">
+            @foreach (var row in TextRows)
+            {
+                <p>-&#8203;@row;</p>
+            }
+        </div>
+    }        
+    <div style="direction: rtl;">
+        <button @onclick="OnClose" class="ptg-button" style="width: 35%;">
+            Закрыть
+        </button>
+    </div>    
+</div>
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public string[] TextRows { get; set; } = [];
+    [Parameter] public EventCallback OnClose { get; set; }
+}

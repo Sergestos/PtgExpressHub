@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PtgExpressHub.GithubActions
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.StorageFunction", "PtgExpressHub.StorageFunction\PtgExpressHub.StorageFunction.csproj", "{B2BDAE4D-CE0E-498E-B5EC-6DDD4A3E016E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PtgExpressHub.Domain.Data", "PtgExpressHub.Domain.Data\PtgExpressHub.Domain.Data.csproj", "{B9FEFAE9-8BEE-47EE-8A4E-7E14C83D0B2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.Domain.Data", "PtgExpressHub.Domain.Data\PtgExpressHub.Domain.Data.csproj", "{B9FEFAE9-8BEE-47EE-8A4E-7E14C83D0B2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

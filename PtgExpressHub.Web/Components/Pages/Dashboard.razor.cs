@@ -1,22 +1,24 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+﻿using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Components;
 using PtgExpressHub.Domain.Entities;
 
 namespace PtgExpressHub.Web.Components.Pages;
 
 public partial class Dashboard
 {
-    private bool isAuthenticated;
+    private bool _isAuthenticated;
+    private Dictionary<Guid, ApplicationBuildVersion> _selectedApplicationVersions = new();
 
-    private Dictionary<Guid, ApplicationBuildVersion> _selectedApplicationVersions = new Dictionary<Guid, ApplicationBuildVersion>();
+    public bool IsModalOpen = false;
+    public string[]? ChangeLogs = null;
 
     public IList<ApplicationBuild>? ComportApplications { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()    
     {
-        isAuthenticated = await _authService.IsAuthorizedAsync();
+        _isAuthenticated = await _authService.IsAuthorizedAsync();
 
-        if (!isAuthenticated)
+        if (!_isAuthenticated)
         {
             _navigationManager.NavigateTo("/auth/login");
         }
@@ -25,15 +27,17 @@ public partial class Dashboard
         ComportApplications = result.OrderBy(item => item.ApplicationBuildVersions!.Max(x => x.UploadDate))
             .Reverse()
             .ToList();
+
+        foreach (var item in ComportApplications)
+            _selectedApplicationVersions[item.ApplicationBuildId] = item.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).First()!;
     }
 
     public async Task DownloadFile(ApplicationBuild application)
     {
-        string applicationUrl = string.Empty;
-        if (_selectedApplicationVersions.ContainsKey(application.ApplicationBuildId))
-            applicationUrl = _selectedApplicationVersions[application.ApplicationBuildId].BlobUrl;
-        else
-            applicationUrl = application.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).First()!.BlobUrl;
+        if (IsModalOpen)
+            return;
+
+        string applicationUrl = _selectedApplicationVersions[application.ApplicationBuildId].BlobUrl;
 
         Stream fileStream = new MemoryStream([0, 1]);
         var fileName = "application.txt";
@@ -47,5 +51,22 @@ public partial class Dashboard
         var selectedApplicationVersionId = Guid.Parse(e.Value!.ToString()!);
         _selectedApplicationVersions[application.ApplicationBuildId] =            
             application.ApplicationBuildVersions!.First(x => x.ApplicationVersionId == selectedApplicationVersionId);
+    }
+
+    public void ShowModal(ApplicationBuild application)
+    {        
+        var version = _selectedApplicationVersions[application.ApplicationBuildId];
+        if (!string.IsNullOrEmpty(version.ChangeLog))
+        {
+            IsModalOpen = true;
+            ChangeLogs = version.ChangeLog
+                .Split(';')
+                .Select(x => x.Trim().Insert(0, " "))
+                .ToArray();
+        }        
+    }
+    public void NavigateToLink(ApplicationBuild application)
+    {
+        _navigationManager.NavigateTo(application.ApplicationRepositoryUrl);
     }
 }

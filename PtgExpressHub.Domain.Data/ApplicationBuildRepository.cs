@@ -37,6 +37,7 @@ public class ApplicationBuildRepository : IApplicationRepository
     public async Task<IList<ApplicationBuild>> GetAllApplicationsBuildAsync(CancellationToken cancellationToken)
     {
         return await _dbContext.ApplicationBuilds
+            .Include(x => x.ApplicationBuildVersions)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
@@ -45,6 +46,7 @@ public class ApplicationBuildRepository : IApplicationRepository
     {
         return await _dbContext.ApplicationBuilds!
             .Include(x => x.ApplicationBuildVersions)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.ApplicationBuildProductionName == productionName, cancellationToken);
     }
 }

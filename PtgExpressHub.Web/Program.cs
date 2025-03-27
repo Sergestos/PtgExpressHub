@@ -19,7 +19,7 @@ public class Program
             options.UseSqlServer(builder.Configuration.GetConnectionString("CloudConnection")));
 
         builder.Services.AddScoped<AuthService>();
-        builder.Services.AddScoped<IApplicationRepository, TestApplicationRepository>();
+        builder.Services.AddScoped<IApplicationRepository, ApplicationBuildRepository>();
         builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
         builder.Services.AddAuthentication("CookieAuth")

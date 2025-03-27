@@ -3,12 +3,11 @@
     flex-direction: row;
     justify-content: space-evenly;
     flex-wrap: wrap;
-
-    margin: 2rem 2rem;    
+    margin: 2rem 2rem;
 }
 
 .app-card {
-    width: 25rem;
+    width: 27.5rem;
     margin-top: 2rem;
 
     background-color: #ffffff;
@@ -17,6 +16,19 @@
     overflow: hidden;
     
     padding: 1rem;
+}
+
+.app-card .header-user-name {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.github-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+    cursor: pointer;
 }
 
 .card-title {
@@ -52,6 +64,13 @@
     margin-bottom: 0.5rem;
 }
 
+.download-section .change-log {
+    width: 32px;
+    height: 32px;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
 .download-section .btn-download {
     border: 1px solid #1b1b1b;
     border-radius: 5px;
@@ -72,4 +91,16 @@
 
 .select-container {
     width: 8rem;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 999;
 }
