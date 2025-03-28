@@ -1,4 +1,4 @@
-﻿namespace PtgExpressHub.Domain.Entities;
+﻿namespace PtgExpressHub.StorageFunction.Models;
 
 public class BuildVersion
 {
@@ -28,7 +28,7 @@ public class BuildVersion
     public BuildVersion IncrementPatch()
     {
         return new BuildVersion(Major, Minor, ++Patch);
-    }    
+    }
 
     public override string ToString()
     {

@@ -3,22 +3,22 @@ using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using PtgExpressHub.Domain;
-using PtgExpressHub.Domain.Entities;
+using PtgExpressHub.StorageFunction.Models;
+using PtgExpressHub.StorageFunction.Services;
 
 namespace PtgExpressHub.StorageFunction;
 
 public class ArtifactUploadFunction
 {
     private readonly ILogger _logger;
-    private readonly IApplicationRepository _applicationRepository;
+    private readonly IApplicationBuildService _applicationBuildService;
 
     private readonly JsonSerializerOptions options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-    public ArtifactUploadFunction(ILoggerFactory loggerFactory, IApplicationRepository applicationRepository)
+    public ArtifactUploadFunction(ILoggerFactory loggerFactory, IApplicationBuildService applicationBuildService)
     {
         _logger = loggerFactory.CreateLogger<ArtifactUploadFunction>();
-        _applicationRepository = applicationRepository;
+        _applicationBuildService = applicationBuildService;
     }
 
     [Function("upload-artifacts-function")]
@@ -26,69 +26,27 @@ public class ArtifactUploadFunction
     {
         _logger.LogInformation("HTTP trigger function processed a request.");
 
-        HttpResponseData response = await HandleArtifactUploadAsync(request, cancellationToken);
-
-        return response;
-    }
-
-    private async Task<HttpResponseData> HandleArtifactUploadAsync(HttpRequestData request, CancellationToken cancellationToken)
-    {        
         var requestData = await JsonSerializer.DeserializeAsync<ArtifactUploadRequest>(request.Body, options);
-        if (requestData == null)        
-            return BuildResponse(request, HttpStatusCode.BadRequest, "Request data was not deserialized correctly.");
-
-        string? lastVersion = null;
-        var applicationBuild = await _applicationRepository.GetApplicationsBuildByProductionNameAsync(requestData.ApplicationBuildProductionName, cancellationToken);
-        if (applicationBuild == null)
+        if (requestData == null)
         {
-            var build = new ApplicationBuild()
-            {
-                ApplicationBuildId = Guid.NewGuid(),
-                ApplicationBuildProductionName = requestData.ApplicationBuildProductionName,
-                ApplicationBuildUserName = requestData.ApplicationBuildUserName,
-                ApplicationRepositoryUrl = requestData.RepositoryUrl,
-            }; 
-
-            applicationBuild = await _applicationRepository.CreateApplicationBuildAsync(build, cancellationToken);
-        }
-        else
-        {
-            lastVersion = applicationBuild.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).First().Version;
+            string message = "Error while deserialized request data";
+            _logger.LogInformation(message);
+            return BuildResponse(request, HttpStatusCode.BadRequest, message);
         }
 
-        var applicationBuildVersion = new ApplicationBuildVersion()
+        try
         {
-            ApplicationVersionId = Guid.NewGuid(),
-            BlobUrl = requestData.ApplicationBuildBlobPath,
-            ChangeLog = requestData.ChangeLog,
-            UploadDate = DateTime.UtcNow,
-            ApplicationBuild = applicationBuild,
-            Version = IncrementVersion(requestData.Version, lastVersion)
-        };
+            await _applicationBuildService.CreateAsync(requestData, cancellationToken);
 
-        await _applicationRepository.CreateApplicationBuildVersionAsync(applicationBuild.ApplicationBuildId, applicationBuildVersion, cancellationToken);
-
-        return BuildResponse(request, HttpStatusCode.OK, "Request has been completed successfully.");
-    }
-
-    private string IncrementVersion(string newVersion, string? lastVersion)
-    {
-        if (lastVersion == null)
-            return newVersion;
-
-        BuildVersion lastBuildVersion = BuildVersion.Parse(lastVersion);
-        BuildVersion newBuildVersion = BuildVersion.Parse(newVersion);
-
-        if (lastBuildVersion.Major == newBuildVersion.Major && lastBuildVersion.Minor == newBuildVersion.Minor)
-            return lastBuildVersion.IncrementPatch().ToString();
-
-        if (lastBuildVersion.Major == newBuildVersion.Major && lastBuildVersion.Minor != newBuildVersion.Minor)
-            return lastBuildVersion.IncrementMinor().ToString();
-
-        if (lastBuildVersion.Major != newBuildVersion.Major)
-            return lastBuildVersion.IncrementMajor().ToString();
-
-        return lastVersion;
+            string message = "Request has been processed successfully.";
+            _logger.LogInformation(message);
+            return BuildResponse(request, HttpStatusCode.OK, message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation(ex.Message);
+            return BuildResponse(request, HttpStatusCode.InternalServerError, ex.Message);
+        }
     }
 
     private HttpResponseData BuildResponse(HttpRequestData request, HttpStatusCode httpStatusCode, string message)

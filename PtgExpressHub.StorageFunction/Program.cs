@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PtgExpressHub.Domain;
+using PtgExpressHub.StorageFunction.Services;
 
 var config = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
@@ -21,6 +22,8 @@ var host = new HostBuilder()
             options.UseSqlServer(connectionString));
 
         services.AddScoped<IApplicationRepository, ApplicationBuildRepository>();
+        services.AddScoped<IApplicationBuildService, ApplicationBuildService>();
+
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
     })

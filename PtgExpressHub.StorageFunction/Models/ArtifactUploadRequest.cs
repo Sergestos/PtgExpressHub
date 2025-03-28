@@ -1,6 +1,6 @@
-﻿namespace PtgExpressHub.StorageFunction;
+﻿namespace PtgExpressHub.StorageFunction.Models;
 
-internal class ArtifactUploadRequest
+public class ArtifactUploadRequest
 {
     public required string ApplicationBuildProductionName { get; set; }
 
