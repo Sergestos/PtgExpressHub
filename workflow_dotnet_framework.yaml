@@ -44,15 +44,23 @@ jobs:
 
       - name: Get Application Version
         run: |
-          $match = Select-String -Path <PTG:APP-NAME>/Properties/AssemblyInfo.cs -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+\.\d+)"\)' 
+          $match = Select-String -Path <PTG:APP-NAME>/Properties/AssemblyInfo.cs -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+)"\)' 
           if ($match.Matches.Count -gt 0) {
               $version = $match.Matches[0].Groups[1].Value
               echo "APP_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
+              echo "$version"
+              echo "APP_VERSION"
           } else {
               echo "Error: Version not found!" 
               exit 1
           }
         shell: pwsh
+
+      - name: Get Repository URL & Commit Message
+        run: |
+          echo "REPO_URL=${{ github.server_url }}/${{ github.repository }}" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+        shell: bash
 
       - name: Install Azure CLI
         run: |
@@ -68,6 +76,27 @@ jobs:
         run: |
             $folderName = "<PTG:APP-NAME>$(New-Guid)"            
             $result = az storage blob upload-batch --account-name <PTG:STORAGE-ACCOUNT> --account-key ${{ secrets.AZURE_STORAGE_KEY }} --destination <PTG:STORAGE-NAME>/$folderName --source <PTG:APP-NAME>/bin/Release
+            $blobUrl = "https://<PTG:STORAGE-ACCOUNT>.blob.core.windows.net/<PTG:STORAGE-NAME>/$folderName"
+            Write-Host "BLOB_URL=$blobUrl" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
             Write-Host "Upload Result: $result"
             Write-Host "Uploaded to folder: $folderName"
+        shell: pwsh
+
+      - name: Call Azure Function
+        run: |
+            $payload = @{
+                ApplicationBuildProductionName = "<PTG:APP-NAME>"
+                ApplicationBuildUserName = "<PTG:APP-NAME>"
+                ApplicationBuildBlobPath = "${{ env.BLOB_URL }}"
+                Version = "$version"
+                RepositoryUrl = "${{ env.REPO_URL }}"
+                ChangeLog = "${{ env.COMMIT_MESSAGE }}"
+            } | ConvertTo-Json -Depth 3
+
+            $headers = @{
+                "Content-Type" = "application/json"
+                "x-functions-key" = "${{ secrets.AZURE_FUNCTION_KEY }}"
+            }
+
+            Invoke-RestMethod -Uri "https://<AZURE-FUNCTION-URL>" -Method Post -Body $payload -Headers $headers
         shell: pwsh
