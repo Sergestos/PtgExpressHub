@@ -1,25 +1,18 @@
-# App and Storage setup:
-# <PTG:APP-NAME> - application's name without path
-# <PTG:STORAGE-ACCOUNT> - name of starage in Azure Storage
-# <PTG:STORAGE-NAME> - name of a storage from Azure Srorage Account 
- 
-# Azure secters setup:
-# To create tenant and rbac credentials for github action 
-# Run 'az ad sp create-for-rbac 
-#      --name "github-actions" 
-#      --role "Storage Blob Data Contributor" 
-#      --scopes "/subscriptions/$(az account show 
-#      --query id -o tsv)/resourceGroups/<AZ:RESOURCE-GROUP>/providers/Microsoft.Storage/storageAccounts/<AZ:STORAGE-ACCOUNT>"'
-# Where: 
-#   - <AZ:RESOURCE-GROUP> is a name of resource group with the Azure Storage
-#   - <AZ:STORAGE-ACCOUNT> Name of a Azure Storage Account, same as <PTG:STORAGE-ACCOUNT>
-# In resulting query fetch next secrets:
-#   - appId for secrets.AZURE_CLIENT_ID
-#   - password for secrets.AZURE_CLIENT_SECRET
-#   - tenant for secrets.AZURE_TENANT_ID
-# These secrets must be put in the Github Action Secrets 
+# App and Azure Services setup:
+# <PTG:PRODUCTION-APP-NAME> - application's production(working) name without path
+# <PTG:USER-APP-NAME>       - application's user displaying name without path
+# <PTG:STORAGE-ACCOUNT>     - name of starage in Azure Storage
+# <PTG:STORAGE-NAME>        - name of a storage from Azure Srorage Account 
+# <PTG:AZURE-FUNCTION-URL>  - full url of certain Azure Function
 
 name: Build and Deploy to Azure Blob 
+
+env:
+  $PTG:PRODUCTION-APP-NAME: <PTG:PRODUCTION-APP-NAME>
+  $PTG:USER-APP-NAME: <PTG:USER-APP-NAME>
+  $PTG:STORAGE-ACCOUNT: <PTG:STORAGE-ACCOUNT>
+  $PTG:STORAGE-NAME: <PTG:STORAGE-NAME>
+  $PTG:AZURE-FUNCTION-URL: <AZURE-FUNCTION-URL>
 
 on:
   push:
@@ -40,11 +33,11 @@ jobs:
         uses: microsoft/setup-msbuild@v1
         
       - name: Build Solution
-        run: msbuild <PTG:APP-NAME>.sln /p:Configuration=Release
+        run: msbuild $PTG:PRODUCTION-APP-NAME.sln /p:Configuration=Release
 
       - name: Get Application Version
         run: |
-          $match = Select-String -Path <PTG:APP-NAME>/Properties/AssemblyInfo.cs -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+)"\)' 
+          $match = Select-String -Path $PTG:PRODUCTION-APP-NAME/Properties/AssemblyInfo.cs -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+\.\d+)"\)'
           if ($match.Matches.Count -gt 0) {
               $version = $match.Matches[0].Groups[1].Value
               echo "APP_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
@@ -69,14 +62,20 @@ jobs:
         shell: pwsh
       
       - name: Azure Login
-        run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+        run: az login 
+            --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }}
+            --tenant ${{ secrets.AZURE_TENANT_ID }}
         shell: pwsh
       
       - name: Upload to Azure Storage
         run: |
-            $folderName = "<PTG:APP-NAME>$(New-Guid)"            
-            $result = az storage blob upload-batch --account-name <PTG:STORAGE-ACCOUNT> --account-key ${{ secrets.AZURE_STORAGE_KEY }} --destination <PTG:STORAGE-NAME>/$folderName --source <PTG:APP-NAME>/bin/Release
-            $blobUrl = "https://<PTG:STORAGE-ACCOUNT>.blob.core.windows.net/<PTG:STORAGE-NAME>/$folderName"
+            $folderName = "$PTG:PRODUCTION-APP-NAME$(New-Guid)"            
+            $result = az storage blob upload-batch 
+                --account-name $PTG:STORAGE-ACCOUNT 
+                --account-key ${{ secrets.AZURE_STORAGE_KEY }}
+                --destination $PTG:STORAGE-NAME/$folderName 
+                --source $PTG:PRODUCTION-APP-NAME/bin/Release
+            $blobUrl = "https://$PTG:STORAGE-ACCOUNT.blob.core.windows.net/$PTG:STORAGE-NAME/$folderName"
             Write-Host "BLOB_URL=$blobUrl" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
             Write-Host "Upload Result: $result"
             Write-Host "Uploaded to folder: $folderName"
@@ -85,9 +84,9 @@ jobs:
       - name: Call Azure Function
         run: |
             $payload = @{
-                ApplicationBuildProductionName = "<PTG:APP-NAME>"
-                ApplicationBuildUserName = "<PTG:APP-NAME>"
-                ApplicationBuildBlobPath = "${{ env.BLOB_URL }}"
+                ApplicationBuildProductionName = "$PTG:PRODUCTION-APP-NAME"
+                ApplicationBuildUserName = $$PTG:USER-APP-NAME"
+                ApplicationBuildBlobPath = "$blobUrl"
                 Version = "$version"
                 RepositoryUrl = "${{ env.REPO_URL }}"
                 ChangeLog = "${{ env.COMMIT_MESSAGE }}"
@@ -98,5 +97,5 @@ jobs:
                 "x-functions-key" = "${{ secrets.AZURE_FUNCTION_KEY }}"
             }
 
-            Invoke-RestMethod -Uri "https://<AZURE-FUNCTION-URL>" -Method Post -Body $payload -Headers $headers
+            Invoke-RestMethod -Uri "$PTG:AZURE-FUNCTION-URL" -Method Post -Body $payload -Headers $headers
         shell: pwsh
