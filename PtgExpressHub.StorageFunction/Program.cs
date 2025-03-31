@@ -19,7 +19,7 @@ var host = new HostBuilder()
     .ConfigureServices(services =>
     {
         services.AddDbContext<PtgExpressDataContext>(options =>
-            options.UseSqlServer(connectionString));
+            options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
         services.AddScoped<IApplicationRepository, ApplicationBuildRepository>();
         services.AddScoped<IApplicationBuildService, ApplicationBuildService>();
