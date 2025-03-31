@@ -1,19 +1,19 @@
 # App and Azure Services setup:
-# <PTG:PRODUCTION-APP-NAME> - application's production(working) name without path
-# <PTG:USER-APP-NAME>       - application's user displaying name without path
-# <PTG:STORAGE-ACCOUNT>     - name of starage in Azure Storage
-# <PTG:STORAGE-NAME>        - name of a storage from Azure Srorage Account 
-# <PTG:AZURE-FUNCTION-URL>  - full url of certain Azure Function
+# PTG_PRODUCTION_APP_NAME - application's production(working) name without path
+# PTG_USER_APP_NAME       - application's user displaying name without path
+# PTG_STORAGE_ACCOUNT     - name of starage in Azure Storage
+# PTG_STORAGE_NAME        - name of a storage folder from Azure Srorage Account 
+# PTG_AZURE_FUNCTION_URL  - full url of certain Azure Function
 
 name: Build and Deploy to Azure Blob 
 
 env:
-  $PTG:PRODUCTION-APP-NAME: <PTG:PRODUCTION-APP-NAME>
-  $PTG:USER-APP-NAME: <PTG:USER-APP-NAME>
-  $PTG:STORAGE-ACCOUNT: <PTG:STORAGE-ACCOUNT>
-  $PTG:STORAGE-NAME: <PTG:STORAGE-NAME>
-  $PTG:AZURE-FUNCTION-URL: <AZURE-FUNCTION-URL>
-
+  PTG_PRODUCTION_APP_NAME: _
+  PTG_USER_APP_NAME: _
+  PTG_STORAGE_ACCOUNT: _
+  PTG_STORAGE_NAME: _
+  PTG_AZURE_FUNCTION_URL: _
+ 
 on:
   push:
     branches:
@@ -33,16 +33,15 @@ jobs:
         uses: microsoft/setup-msbuild@v1
         
       - name: Build Solution
-        run: msbuild $PTG:PRODUCTION-APP-NAME.sln /p:Configuration=Release
+        run: msbuild "$env:PTG_PRODUCTION_APP_NAME.sln" /p:Configuration=Release
 
       - name: Get Application Version
         run: |
-          $match = Select-String -Path $PTG:PRODUCTION-APP-NAME/Properties/AssemblyInfo.cs -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+\.\d+)"\)'
+          $match = Select-String -Path "$env:PTG_PRODUCTION_APP_NAME/Properties/AssemblyInfo.cs" `
+              -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+\.\d+)"\)'
           if ($match.Matches.Count -gt 0) {
               $version = $match.Matches[0].Groups[1].Value
-              echo "APP_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
-              echo "$version"
-              echo "APP_VERSION"
+              echo "APP_VERSION=$version" >> $env:GITHUB_ENV
           } else {
               echo "Error: Version not found!" 
               exit 1
@@ -54,48 +53,36 @@ jobs:
           echo "REPO_URL=${{ github.server_url }}/${{ github.repository }}" >> $GITHUB_ENV
           echo "COMMIT_MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
         shell: bash
-
-      - name: Install Azure CLI
-        run: |
-          Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile AzureCLI.msi
-          Start-Process msiexec.exe -ArgumentList '/i AzureCLI.msi /quiet /norestart' -Wait
-        shell: pwsh
       
       - name: Azure Login
-        run: az login 
-            --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }}
-            --tenant ${{ secrets.AZURE_TENANT_ID }}
+        run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
         shell: pwsh
       
       - name: Upload to Azure Storage
         run: |
-            $folderName = "$PTG:PRODUCTION-APP-NAME$(New-Guid)"            
-            $result = az storage blob upload-batch 
-                --account-name $PTG:STORAGE-ACCOUNT 
-                --account-key ${{ secrets.AZURE_STORAGE_KEY }}
-                --destination $PTG:STORAGE-NAME/$folderName 
-                --source $PTG:PRODUCTION-APP-NAME/bin/Release
-            $blobUrl = "https://$PTG:STORAGE-ACCOUNT.blob.core.windows.net/$PTG:STORAGE-NAME/$folderName"
-            Write-Host "BLOB_URL=$blobUrl" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
+            $folderName = "$env:PTG_PRODUCTION_APP_NAME-$(New-Guid)"        
+            $result = az storage blob upload-batch `
+                --account-name $env:PTG_STORAGE_ACCOUNT `
+                --account-key ${{ secrets.AZURE_STORAGE_KEY }} `
+                --destination $env:PTG_STORAGE_NAME/$folderName `
+                --source $env:PTG_PRODUCTION_APP_NAME/bin/Release 
+            $blobUrl = "https://$env:PTG_STORAGE_ACCOUNT.blob.core.windows.net/$env:PTG_STORAGE_NAME/$folderName"
+            echo "BLOB_URL=$blobUrl" >>  $env:GITHUB_ENV
             Write-Host "Upload Result: $result"
             Write-Host "Uploaded to folder: $folderName"
+            Write-Host "BLOB_URL=$blobUrl"
         shell: pwsh
 
       - name: Call Azure Function
         run: |
             $payload = @{
-                ApplicationBuildProductionName = "$PTG:PRODUCTION-APP-NAME"
-                ApplicationBuildUserName = $$PTG:USER-APP-NAME"
-                ApplicationBuildBlobPath = "$blobUrl"
-                Version = "$version"
+                ApplicationBuildProductionName = "$env:PTG_PRODUCTION_APP_NAME"
+                ApplicationBuildUserName = "$env:PTG_USER_APP_NAME"
+                ApplicationBuildBlobPath = "${{ env.BLOB_URL }}"
+                Version = "${{ env.APP_VERSION }}"
                 RepositoryUrl = "${{ env.REPO_URL }}"
                 ChangeLog = "${{ env.COMMIT_MESSAGE }}"
             } | ConvertTo-Json -Depth 3
-
-            $headers = @{
-                "Content-Type" = "application/json"
-                "x-functions-key" = "${{ secrets.AZURE_FUNCTION_KEY }}"
-            }
-
-            Invoke-RestMethod -Uri "$PTG:AZURE-FUNCTION-URL" -Method Post -Body $payload -Headers $headers
+      
+            echo "$payload"
         shell: pwsh
