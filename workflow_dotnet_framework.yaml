@@ -3,7 +3,6 @@
 # PTG_USER_APP_NAME       - application's user displaying name without path
 # PTG_STORAGE_ACCOUNT     - name of starage in Azure Storage
 # PTG_STORAGE_NAME        - name of a storage folder from Azure Srorage Account 
-# PTG_AZURE_FUNCTION_URL  - full url of certain Azure Function
 
 name: Build and Deploy to Azure Blob 
 
@@ -12,7 +11,6 @@ env:
   PTG_USER_APP_NAME: _
   PTG_STORAGE_ACCOUNT: _
   PTG_STORAGE_NAME: _
-  PTG_AZURE_FUNCTION_URL: _
  
 on:
   push:
@@ -83,6 +81,7 @@ jobs:
                 RepositoryUrl = "${{ env.REPO_URL }}"
                 ChangeLog = "${{ env.COMMIT_MESSAGE }}"
             } | ConvertTo-Json -Depth 3
-      
-            echo "$payload"
+
+            $response = Invoke-RestMethod -Uri ${{ secrets.AZURE_FUNCTION_URL }} -Method Post -Body $payload
+            Write-Host "Response from Azure Function: $($response)"        
         shell: pwsh
