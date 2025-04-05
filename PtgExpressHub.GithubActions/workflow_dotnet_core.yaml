@@ -29,7 +29,6 @@ jobs:
       - name: Build Solution
         run: dotnet build "$env:PTG_PRODUCTION_APP_NAME.sln" --configuration Release --no-restore
 
-      # fix metadata fetch from appsettings file
       - name: Get Application Metadata
         run: |
           $file = "$env:PTG_PRODUCTION_APP_NAME/Properties/AssemblyInfo.cs"

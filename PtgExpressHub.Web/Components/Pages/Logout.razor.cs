@@ -1,12 +1,15 @@
-﻿namespace PtgExpressHub.Web.Components.Pages;
+﻿using Microsoft.AspNetCore.Components;
+
+namespace PtgExpressHub.Web.Components.Pages;
 
 public partial class Logout
 {
-    protected override async Task OnInitializedAsync()
-    {
-        var customAuthProvider = (CustomAuthenticationStateProvider)AuthenticationStateProvider;
-        await customAuthProvider.MarkUserAsLoggedOut();
+    [CascadingParameter]
+    public HttpContext HttpContext { get; set; } = default!;
 
-        Navigation.NavigateTo("/");
+    protected async override Task OnInitializedAsync()
+    {
+        await _authService.LogOutUserAsync(HttpContext);
+        _navigation.NavigateTo("/auth/login");
     }
 }

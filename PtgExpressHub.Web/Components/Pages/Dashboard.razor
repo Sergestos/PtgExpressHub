@@ -1,15 +1,14 @@
 ﻿@using Microsoft.AspNetCore.Authorization
 @using PtgExpressHub.Domain
-@using PtgExpressHub.Web.Runtime
 
 @page "/"
 
 @inject IJSRuntime _jsRuntime
 @inject IApplicationRepository _applicationRepository;
-@inject AuthService _authService;
+@inject AuthenticationService _authService;
 @inject NavigationManager _navigationManager;
 
-@rendermode @(new InteractiveServerRenderMode(prerender: true))
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -17,47 +16,57 @@
     <ChangeLogModal IsOpen="@IsModalOpen" TextRows="@ChangeLogs" OnClose="() => IsModalOpen = false" />
 </div>
 
-<div class="main-container" style="opacity:@(IsModalOpen ? "0.5" : "1")">
-    @if (ComportApplications != null && ComportApplications.Count > 0)
-    {
-        @foreach (var application in ComportApplications)
+@if (IsLoading)
+{
+    <div class="spinner-overlay">
+        <div class="spinner"></div>
+    </div>
+}
+else
+{
+    <div class="main-container" style="opacity:@(IsModalOpen ? "0.5" : "1")">
+        @if (ComportApplications != null && ComportApplications.Count > 0)
         {
-            <div class="app-card">
-                <div class="header-user-name">
-                    <p class="card-title">@application.ApplicationBuildUserName</p>
-                    <img class="github-icon" src="/github.png" @onclick="() => NavigateToLink(application)" />
-                </div>
-                @if (application.ApplicationBuildUserName != @application.ApplicationBuildProductionName)
-                {
-                    <p>@application.ApplicationBuildProductionName</p>
-                }
-                else
-                {
-                    <p>&#8203;</p>
-                }
-                <div class="version-block card-data-section">
-                    <p>Последняя версия: </p>
-                    <p>@application.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.Version</p>
-                </div>
-                <div class="data-block card-data-section">
-                    <p>Последнее обновление: </p>
-                    <p>@application.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.UploadDate.ToString("dd/MM/yyyy HH:mm")</p>
-                </div>
-                <div class="download-section">
-                    <button class="btn-download" @onclick="async () => await DownloadFile(application)">Скачать указанную версию</button>
-                    <div class="select-container">
-                        <select class="form-select" @onchange="(e) => OnSelectChanged(application, e)">
-                            @foreach (var version in application.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate))
-                            {
-                                <option value="@version.ApplicationVersionId">
-                                    @version.Version
-                                </option>                 
-                            }
-                        </select>
+            @foreach (var application in ComportApplications)
+            {
+                <div class="app-card">
+                    <div class="header-user-name">
+                        <p class="card-title">@application.ApplicationBuildUserName</p>
+                        <img class="github-icon" src="/github.png" @onclick="() => NavigateToLink(application)" />
                     </div>
-                    <img class="change-log" src="/file_64.png" @onclick="() => ShowModal(application)" />
+                    @if (application.ApplicationBuildUserName != @application.ApplicationBuildProductionName)
+                    {
+                        <p>@application.ApplicationBuildProductionName</p>
+                    }
+                    else
+                    {
+                        <p>&#8203;</p>
+                    }
+                    <div class="version-block card-data-section">
+                        <p>Последняя версия: </p>
+                        <p>@application.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.Version</p>
+                    </div>
+                    <div class="data-block card-data-section">
+                        <p>Последнее обновление: </p>
+                        <p>@application.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.UploadDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                    <div class="download-section">
+                        <button class="btn-download" @onclick="async () => await DownloadFile(application)">Скачать указанную версию</button>
+                        <div class="select-container">
+                            <select class="form-select" @onchange="(e) => OnSelectChanged(application, e)">
+                                @foreach (var version in application.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate))
+                                {
+                                    <option value="@version.ApplicationVersionId">
+                                        @version.Version
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <img class="change-log" src="/log-file-format.png" @onclick="() => ShowModal(application)" />
+                    </div>
                 </div>
-            </div>
+            }
         }
-    }    
-</div>
+    </div>
+
+}

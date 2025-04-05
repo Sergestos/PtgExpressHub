@@ -1,8 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
-@using PtgExpressHub.Web.Runtime
 
 @inherits LayoutComponentBase
-@inject AuthService authService
+@inject AuthenticationService _authService
 
 @if (@IsAuthorized)
 {
@@ -18,10 +17,13 @@ else
 }
 
 @code {
+    [CascadingParameter]
+    public HttpContext HttpContext { get; set; } = default!;
+
     public bool IsAuthorized { get; set; } = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        IsAuthorized = await authService.IsAuthorizedAsync();
+        IsAuthorized = _authService.IsUserAuthenticated();       
     }
 }

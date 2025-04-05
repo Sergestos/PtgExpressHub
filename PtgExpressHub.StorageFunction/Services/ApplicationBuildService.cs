@@ -34,6 +34,7 @@ public sealed class ApplicationBuildService : IApplicationBuildService
             lastVersion = applicationBuild.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).First().Version;
         }
 
+        var formattedVersion = string.Join(".", requestData.Version.Split('.').Take(3));
         var applicationBuildVersion = new ApplicationBuildVersion()
         {
             ApplicationVersionId = Guid.NewGuid(),
@@ -41,7 +42,7 @@ public sealed class ApplicationBuildService : IApplicationBuildService
             ChangeLog = requestData.ChangeLog,
             UploadDate = DateTime.UtcNow,
             ApplicationBuild = applicationBuild,
-            Version = IncrementVersion(requestData.Version, lastVersion)
+            Version = IncrementVersion(formattedVersion, lastVersion)
         };
 
         await _applicationRepository.CreateApplicationBuildVersionAsync(applicationBuild.ApplicationBuildId, applicationBuildVersion, cancellationToken);

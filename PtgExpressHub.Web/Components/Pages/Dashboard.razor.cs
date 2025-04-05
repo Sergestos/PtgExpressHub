@@ -6,6 +6,8 @@ namespace PtgExpressHub.Web.Components.Pages;
 
 public partial class Dashboard
 {
+    public bool IsLoading;
+
     private bool _isAuthenticated;
     private Dictionary<Guid, ApplicationBuildVersion> _selectedApplicationVersions = new();
 
@@ -16,18 +18,20 @@ public partial class Dashboard
 
     protected override async Task OnInitializedAsync()    
     {
-        _isAuthenticated = await _authService.IsAuthorizedAsync();
+        _isAuthenticated = _authService.IsUserAuthenticated();
 
         if (!_isAuthenticated)
         {
             _navigationManager.NavigateTo("/auth/login");
         }
 
+        IsLoading = true;
         var result = await _applicationRepository.GetAllApplicationsBuildAsync(CancellationToken.None);
         ComportApplications = result.OrderBy(item => item.ApplicationBuildVersions!.Max(x => x.UploadDate))
             .Reverse()
             .ToList();
 
+        IsLoading = false;
         foreach (var item in ComportApplications)
             _selectedApplicationVersions[item.ApplicationBuildId] = item.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).First()!;
     }

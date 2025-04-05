@@ -1,16 +1,7 @@
-# App and Azure Services setup:
-# PTG_PRODUCTION_APP_NAME - application's production(working) name without path
-# PTG_USER_APP_NAME       - application's user displaying name without path
-# PTG_STORAGE_ACCOUNT     - name of starage in Azure Storage
-# PTG_STORAGE_NAME        - name of a storage folder from Azure Srorage Account 
-
 name: Build and Deploy to Azure Blob 
 
 env:
   PTG_PRODUCTION_APP_NAME: _
-  PTG_USER_APP_NAME: _
-  PTG_STORAGE_ACCOUNT: _
-  PTG_STORAGE_NAME: _
  
 on:
   push:
@@ -33,16 +24,36 @@ jobs:
       - name: Build Solution
         run: msbuild "$env:PTG_PRODUCTION_APP_NAME.sln" /p:Configuration=Release
 
-      - name: Get Application Version
+      - name: Get Application Metadata
         run: |
-          $match = Select-String -Path "$env:PTG_PRODUCTION_APP_NAME/Properties/AssemblyInfo.cs" `
-              -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+\.\d+)"\)'
-          if ($match.Matches.Count -gt 0) {
-              $version = $match.Matches[0].Groups[1].Value
-              echo "APP_VERSION=$version" >> $env:GITHUB_ENV
+          $file = "$env:PTG_PRODUCTION_APP_NAME/Properties/AssemblyInfo.cs"
+
+          $versionMatch = Select-String -Path $file -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+\.\d+)"\)'
+          $titleMatch = Select-String -Path $file -Pattern 'AssemblyTitle\("(.+?)"\)'
+          $productMatch = Select-String -Path $file -Pattern 'AssemblyProduct\("(.+?)"\)'
+
+          if ($versionMatch.Matches.Count -gt 0) {
+            $version = $versionMatch.Matches[0].Groups[1].Value
+            echo "APP_VERSION=$version" >> $env:GITHUB_ENV
           } else {
-              echo "Error: Version not found!" 
-              exit 1
+            echo "Error: Version not found!"
+            exit 1
+          }
+
+          if ($titleMatch.Matches.Count -gt 0) {
+            $title = $titleMatch.Matches[0].Groups[1].Value
+            echo "APP_TITLE=$title" >> $env:GITHUB_ENV
+          } else {
+            echo "Error: Title not found!"
+            exit 1
+          }
+
+          if ($productMatch.Matches.Count -gt 0) {
+            $product = $productMatch.Matches[0].Groups[1].Value
+            echo "APP_PRODUCT=$product" >> $env:GITHUB_ENV
+          } else {
+            echo "Error: Product not found!"
+            exit 1
           }
         shell: pwsh
 
@@ -60,11 +71,11 @@ jobs:
         run: |
             $folderName = "$env:PTG_PRODUCTION_APP_NAME-$(New-Guid)"        
             $result = az storage blob upload-batch `
-                --account-name $env:PTG_STORAGE_ACCOUNT `
+                --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} `
                 --account-key ${{ secrets.AZURE_STORAGE_KEY }} `
-                --destination $env:PTG_STORAGE_NAME/$folderName `
+                --destination ${{ secrets.AZURE_STORAGE_NAME }}/$folderName `
                 --source $env:PTG_PRODUCTION_APP_NAME/bin/Release 
-            $blobUrl = "https://$env:PTG_STORAGE_ACCOUNT.blob.core.windows.net/$env:PTG_STORAGE_NAME/$folderName"
+            $blobUrl = "https://${{ secrets.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/${{ secrets.AZURE_STORAGE_NAME }}/$folderName"
             echo "BLOB_URL=$blobUrl" >>  $env:GITHUB_ENV
             Write-Host "Upload Result: $result"
             Write-Host "Uploaded to folder: $folderName"
@@ -74,8 +85,8 @@ jobs:
       - name: Call Azure Function
         run: |
             $payload = @{
-                ApplicationBuildProductionName = "$env:PTG_PRODUCTION_APP_NAME"
-                ApplicationBuildUserName = "$env:PTG_USER_APP_NAME"
+                ApplicationBuildProductionName = "${{ env.APP_PRODUCT }}"
+                ApplicationBuildUserName = "${{ env.APP_TITLE }}"
                 ApplicationBuildBlobPath = "${{ env.BLOB_URL }}"
                 Version = "${{ env.APP_VERSION }}"
                 RepositoryUrl = "${{ env.REPO_URL }}"

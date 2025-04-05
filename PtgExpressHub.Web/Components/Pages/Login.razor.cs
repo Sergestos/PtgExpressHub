@@ -1,25 +1,32 @@
-﻿namespace PtgExpressHub.Web.Components.Pages;
+﻿using Microsoft.AspNetCore.Components;
+
+namespace PtgExpressHub.Web.Components.Pages;
 
 public partial class Login
 {
-    private UserCredentials credentials = new();
+    [SupplyParameterFromForm]
+    public UserCredentials Credentials { get; set; } = new();
+
+    [CascadingParameter]
+    public HttpContext HttpContext { get; set; } = default!;
 
     private string ErrorMessage { get; set; } = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        if (await _authService.IsAuthorizedAsync())
+        if (HttpContext != null && HttpContext.User.Identity.IsAuthenticated)
         {
-            _navigation.NavigateTo("/");
-        }
+            _navigationManager.NavigateTo("/");
+        }        
     }
 
-    private void HandleLogin()
-    {        
-        if (_authService.AuthenticateUser(credentials.Username!, credentials.Password!))
+    private async Task HandleLoginAsync()
+    {
+        var isAuthentificated = _authenticationService.LoginAsync(Credentials.Username!, Credentials.Password!, HttpContext).Result;
+        if (isAuthentificated)
         {
-            _navigation.NavigateTo("/");
-        }    
+            await Task.Run(() => _navigationManager.NavigateTo("/", true));
+        }            
         else
         {
             ErrorMessage = "Логин или пароль введены неверно.";

@@ -1,8 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 
-@page "/logout"
+@page "/auth/logout"
 
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager Navigation
+@inject AuthenticationService _authService
+@inject NavigationManager _navigation
 
 <h3>Logging out...</h3>
