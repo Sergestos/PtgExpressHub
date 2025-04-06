@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Options;
 using Blazored.LocalStorage;
+using PtgExpressHub.Web.Runtime;
 
 namespace PtgExpressHub.Web;
 
@@ -21,8 +22,9 @@ public class Program
             options.UseSqlServer(
                 builder.Configuration.GetConnectionString("CloudConnection"), 
                 sqlOptions => sqlOptions.EnableRetryOnFailure()));
-
-        builder.Services.AddScoped<AuthenticationService>();
+        
+        builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<StorageDownloaderService>();
         builder.Services.AddScoped<IApplicationRepository, ApplicationBuildRepository>();
         builder.Services.AddBlazoredLocalStorage();
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

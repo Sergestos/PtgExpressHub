@@ -10,7 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PtgExpressHub.GithubActions", "PtgExpressHub.GithubActions", "{185FF494-A7D4-4365-865E-3F408EA3D7EB}"
 	ProjectSection(SolutionItems) = preProject
 		workflow_dotnet_core.yaml = workflow_dotnet_core.yaml
-		workflow_dotnet_framework.yaml = workflow_dotnet_framework.yaml
+		PtgExpressHub.GithubActions\workflow_dotnet_framework.yaml = PtgExpressHub.GithubActions\workflow_dotnet_framework.yaml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PtgExpressHub.StorageFunction", "PtgExpressHub.StorageFunction\PtgExpressHub.StorageFunction.csproj", "{B2BDAE4D-CE0E-498E-B5EC-6DDD4A3E016E}"

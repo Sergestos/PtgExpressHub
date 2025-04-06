@@ -1,12 +1,14 @@
 ﻿@using Microsoft.AspNetCore.Authorization
 @using PtgExpressHub.Domain
+@using PtgExpressHub.Web.Runtime
 
 @page "/"
 
 @inject IJSRuntime _jsRuntime
 @inject IApplicationRepository _applicationRepository;
-@inject AuthenticationService _authService;
-@inject NavigationManager _navigationManager;
+@inject AuthService _authService;
+@inject StorageDownloaderService _storageDownloaderService
+@inject NavigationManager _navigationManager
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 

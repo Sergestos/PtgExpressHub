@@ -41,13 +41,14 @@ public partial class Dashboard
         if (IsModalOpen)
             return;
 
-        string applicationUrl = _selectedApplicationVersions[application.ApplicationBuildId].BlobUrl;
+        string applicationBlobUrl = _selectedApplicationVersions[application.ApplicationBuildId].BlobUrl;
 
-        Stream fileStream = new MemoryStream([0, 1]);
-        var fileName = "application.txt";
-        using var streamRef = new DotNetStreamReference(stream: fileStream);
-
-        await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+        var fileStream = await _storageDownloaderService.DownloadFromStorage(applicationBlobUrl);
+        if (fileStream != null)
+        {
+            using var streamRef = new DotNetStreamReference(stream: fileStream);
+            await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", application.ApplicationBuildUserName, streamRef);
+        }
     }
 
     public void OnSelectChanged(ApplicationBuild application, ChangeEventArgs e)

@@ -2,7 +2,6 @@ name: Build and Deploy to Azure Blob
 
 env:
   PTG_PRODUCTION_APP_NAME: _
- 
 on:
   push:
     branches:
@@ -24,14 +23,19 @@ jobs:
       - name: Build Solution
         run: msbuild "$env:PTG_PRODUCTION_APP_NAME.sln" /p:Configuration=Release
 
+      - name: Create new folder and copy .exe and .dll files
+        run: |        
+          New-Item -ItemType Directory -Path ./publish
+          Get-ChildItem -Recurse -Filter "*.exe" -Path "$env:PTG_PRODUCTION_APP_NAME/bin/Release" | ForEach-Object { Copy-Item $_.FullName -Destination "./publish" }
+          Get-ChildItem -Recurse -Filter "*.dll" -Path "$env:PTG_PRODUCTION_APP_NAME/bin/Release" | ForEach-Object { Copy-Item $_.FullName -Destination "./publish" }
+          Get-ChildItem ./publish
+
       - name: Get Application Metadata
         run: |
           $file = "$env:PTG_PRODUCTION_APP_NAME/Properties/AssemblyInfo.cs"
-
           $versionMatch = Select-String -Path $file -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+\.\d+)"\)'
           $titleMatch = Select-String -Path $file -Pattern 'AssemblyTitle\("(.+?)"\)'
           $productMatch = Select-String -Path $file -Pattern 'AssemblyProduct\("(.+?)"\)'
-
           if ($versionMatch.Matches.Count -gt 0) {
             $version = $versionMatch.Matches[0].Groups[1].Value
             echo "APP_VERSION=$version" >> $env:GITHUB_ENV
@@ -39,7 +43,6 @@ jobs:
             echo "Error: Version not found!"
             exit 1
           }
-
           if ($titleMatch.Matches.Count -gt 0) {
             $title = $titleMatch.Matches[0].Groups[1].Value
             echo "APP_TITLE=$title" >> $env:GITHUB_ENV
@@ -47,7 +50,6 @@ jobs:
             echo "Error: Title not found!"
             exit 1
           }
-
           if ($productMatch.Matches.Count -gt 0) {
             $product = $productMatch.Matches[0].Groups[1].Value
             echo "APP_PRODUCT=$product" >> $env:GITHUB_ENV
@@ -74,7 +76,7 @@ jobs:
                 --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} `
                 --account-key ${{ secrets.AZURE_STORAGE_KEY }} `
                 --destination ${{ secrets.AZURE_STORAGE_NAME }}/$folderName `
-                --source $env:PTG_PRODUCTION_APP_NAME/bin/Release 
+                --source ./publish
             $blobUrl = "https://${{ secrets.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/${{ secrets.AZURE_STORAGE_NAME }}/$folderName"
             echo "BLOB_URL=$blobUrl" >>  $env:GITHUB_ENV
             Write-Host "Upload Result: $result"
@@ -92,7 +94,6 @@ jobs:
                 RepositoryUrl = "${{ env.REPO_URL }}"
                 ChangeLog = "${{ env.COMMIT_MESSAGE }}"
             } | ConvertTo-Json -Depth 3
-
             $response = Invoke-RestMethod -Uri ${{ secrets.AZURE_FUNCTION_URL }} -Method Post -Body $payload
             Write-Host "Response from Azure Function: $($response)"        
         shell: pwsh

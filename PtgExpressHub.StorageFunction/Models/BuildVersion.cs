@@ -39,9 +39,6 @@ public class BuildVersion
     {
         string[] parts = version.Split('.');
 
-        if (parts.Length != 3)
-            throw new ArgumentException("Invalid version format");
-
         int major = int.Parse(parts[0]);
         int minor = int.Parse(parts[1]);
         int patch = int.Parse(parts[2]);

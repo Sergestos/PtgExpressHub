@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
-public class AuthenticationService
+public class AuthService
 {
     private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AuthenticationService(IConfiguration config, IHttpContextAccessor httpContextAccessor, AuthenticationStateProvider authenticationStateProvider)
+    public AuthService(IConfiguration config, IHttpContextAccessor httpContextAccessor, AuthenticationStateProvider authenticationStateProvider)
     {
         _configuration = config;
         _httpContextAccessor = httpContextAccessor;

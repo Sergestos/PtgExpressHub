@@ -29,6 +29,8 @@ jobs:
       - name: Build Solution
         run: dotnet build "$env:PTG_PRODUCTION_APP_NAME.sln" --configuration Release --no-restore
 
+      # Clean non dll and exe files
+
       # fix metadata fetch from appsettings file
       - name: Get Application Metadata
         run: |
@@ -80,7 +82,7 @@ jobs:
                 --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} `
                 --account-key ${{ secrets.AZURE_STORAGE_KEY }} `
                 --destination ${{ secrets.AZURE_STORAGE_NAME }}/$folderName `
-                --source $env:PTG_PRODUCTION_APP_NAME/bin/Release 
+                --source $env:PTG_PRODUCTION_APP_NAME/bin/Release # change to ./publish
             $blobUrl = "https://${{ secrets.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/${{ secrets.AZURE_STORAGE_NAME }}/$folderName"
             echo "BLOB_URL=$blobUrl" >>  $env:GITHUB_ENV
             Write-Host "Upload Result: $result"
