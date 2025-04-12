@@ -43,11 +43,11 @@ public partial class Dashboard
 
         string applicationBlobUrl = _selectedApplicationVersions[application.ApplicationBuildId].BlobUrl;
 
-        var fileStream = await _storageDownloaderService.DownloadFromStorage(applicationBlobUrl);
-        if (fileStream != null)
+        var downloadedData = await _storageDownloaderService.DownloadFromStorage(applicationBlobUrl);
+
+        if (downloadedData != null)
         {
-            using var streamRef = new DotNetStreamReference(stream: fileStream);
-            await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", application.ApplicationBuildUserName, streamRef);
+            await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", application.ApplicationBuildUserName, "application/zip", downloadedData);
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using System.IO.Compression;
 
 namespace PtgExpressHub.Web.Runtime;
 
@@ -11,23 +12,30 @@ public class StorageDownloaderService
         _configuration = configuration;
     }
 
-    public async Task<Stream?> DownloadFromStorage(string storagePath)
+    public async Task<byte[]> DownloadFromStorage(string fullStoragePath)
     {
+        string appName = fullStoragePath.Split('/').Last();
+
         var blobServiceClient = new BlobServiceClient(_configuration["Storage:ConnectionString"]);
         var container = blobServiceClient.GetBlobContainerClient(_configuration["Storage:Folder"]);
-        var blobs = container.GetBlobsByHierarchy(prefix: storagePath.Split('/').Last(), delimiter: "/").ToList()
-                           .Where(item => item.IsBlob) 
-                           .Select(item => container.GetBlobClient(item.Blob.Name))
-                           .ToList();
+        var blobs = container.GetBlobsByHierarchy()
+            .Where(x => x.Blob.Name.StartsWith(appName))
+            .Select(item => container.GetBlobClient(item.Blob.Name))
+            .ToList();
 
-        var combinedStream = new MemoryStream();
-        foreach (var blob in blobs)
+        using var zipStream = new MemoryStream();
+        using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, leaveOpen: true))
         {
-            var blobDownloadInfo = await blob.DownloadAsync();
-            await blobDownloadInfo.Value.Content.CopyToAsync(combinedStream);
+            foreach (var blobItem in blobs)
+            {
+                var blobDownloadInfo = await blobItem.DownloadAsync();
+                var zipEntry = archive.CreateEntry(blobItem.Name);
+
+                using var entryStream = zipEntry.Open();
+                await blobDownloadInfo.Value.Content.CopyToAsync(entryStream);
+            }
         }
 
-        combinedStream.Position = 0;
-        return combinedStream;
+        return zipStream.ToArray();
     }
 }
