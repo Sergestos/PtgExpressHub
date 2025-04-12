@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace PtgExpressHub.Web.Components.Pages;
 
@@ -18,6 +19,11 @@ public partial class Login
         {
             _navigationManager.NavigateTo("/");
         }        
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await _jsRuntime.InvokeVoidAsync("checkAndHideExitBtn");        
     }
 
     private async Task HandleLoginAsync()

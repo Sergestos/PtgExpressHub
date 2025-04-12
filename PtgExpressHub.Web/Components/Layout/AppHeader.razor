@@ -9,17 +9,17 @@
     <div class="header-base">
         <img class="header-base-image" src="/apps.png" />
         <p class="header-base-label">Ptg Express Hub</p>
-    </div>    
-    @if (IsAuthorized)
-    {
+    </div>      
+    @if (IsAuthorized) {
         <div class="header-user">
             <div class="header-user-social" style="display: none">
                 <p class="header-user-social-label">автор</p>
                 <img class="header-user-social-image" src="/telegram.png" />
             </div>
-            <input type="button" value="Выйти" class="ptg-button header-user-logout" @onclick="(e) => OnClick(e)" />
+            <input type="button" value="Выйти" class="ptg-button header-user-logout hide-mark" @onclick="(e) => OnClick(e)" />
         </div>
     }
+  
 </div>
 
 @code {
@@ -27,6 +27,8 @@
 
     protected async override Task OnInitializedAsync()
     {
+        IsAuthorized = !NavigationManager.Uri.Contains("/auth/login");
+
         await Task.Run(() => IsAuthorized = _authService.IsUserAuthenticated());
         _authService.OnAuthStateChanged += async (isAuthorized) =>
         {

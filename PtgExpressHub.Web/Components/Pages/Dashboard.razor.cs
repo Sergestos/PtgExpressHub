@@ -16,6 +16,14 @@ public partial class Dashboard
 
     public IList<ApplicationBuild>? ComportApplications { get; set; }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _jsRuntime.InvokeVoidAsync("checkAndHideExitBtn");
+        }
+    }
+
     protected override async Task OnInitializedAsync()    
     {
         _isAuthenticated = _authService.IsUserAuthenticated();
