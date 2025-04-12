@@ -35,15 +35,8 @@ else
                     <div class="header-user-name">
                         <p class="card-title">@application.ApplicationBuildUserName</p>
                         <img class="github-icon" src="/github.png" @onclick="() => NavigateToLink(application)" />
-                    </div>
-                    @if (application.ApplicationBuildUserName != @application.ApplicationBuildProductionName)
-                    {
-                        <p>@application.ApplicationBuildProductionName</p>
-                    }
-                    else
-                    {
-                        <p>&#8203;</p>
-                    }
+                    </div>                   
+                    <p>@application.ApplicationBuildProductionName</p>                    
                     <div class="version-block card-data-section">
                         <p>Последняя версия: </p>
                         <p>@application.ApplicationBuildVersions!.OrderByDescending(x => x.UploadDate).FirstOrDefault()!.Version</p>

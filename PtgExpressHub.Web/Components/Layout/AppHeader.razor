@@ -25,13 +25,16 @@
 @code {
     public bool IsAuthorized { get; set; } = false;
 
-    protected override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
-        IsAuthorized = _authService.IsUserAuthenticated();
-        _authService.OnAuthStateChanged += (isAuthorized) =>
+        await Task.Run(() => IsAuthorized = _authService.IsUserAuthenticated());
+        _authService.OnAuthStateChanged += async (isAuthorized) =>
         {
-            IsAuthorized = isAuthorized;
-            StateHasChanged();
+            await Task.Run(() =>
+            {
+                IsAuthorized = isAuthorized;
+                StateHasChanged();
+            });            
         };
     }
 
