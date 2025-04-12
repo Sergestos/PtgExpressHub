@@ -1,3 +1,5 @@
+# Work in Progress
+
 # Configure next GitHub Action secrets:
 # -- AZURE_CLIENT_ID:       application identity Id
 # -- AZURE_CLIENT_SECRET:   application identity password
@@ -12,8 +14,8 @@
 #                           should change only major/ninor version
 #                           patch is autoincremented
 # -- AssemblyTitle:         application displayed name for users
-# -- AssemblyProduct        application working name
-#                           should match PTG_PRODUCTION_APP_NAME
+# -- AssemblyProduct:       application working name
+#                           preferable match PTG_PRODUCTION_APP_NAME
 
 name: Build and Deploy to Azure Blob 
 

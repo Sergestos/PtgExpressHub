@@ -18,7 +18,7 @@
 name: Build and Deploy to Azure Blob 
 
 env:
-  PTG_PRODUCTION_APP_NAME: _
+  PTG_PRODUCTION_APP_NAME: _ # csproj name without extension
 
 on:
   push:
@@ -41,19 +41,35 @@ jobs:
       - name: Build Solution
         run: msbuild "$env:PTG_PRODUCTION_APP_NAME.sln" /p:Configuration=Release
 
+      - name: Determine root path
+        id: determine_root
+        run: |
+         if (Test-Path "./$env:PTG_PRODUCTION_APP_NAME") {
+          echo "root=$env:PTG_PRODUCTION_APP_NAME" >> $GITHUB_ENV
+         } else {
+          echo "root=" >> $GITHUB_ENV
+         }
+
       - name: Create new folder and copy .exe and .dll files
-        run: |        
+        run: |    
+          $root = "${{ env.root }}"
+          $sourcePath = if ($root) { Join-Path $root "bin/Release" } else { "bin/Release" }
+          $publishPath = "./publish"
+          
           New-Item -ItemType Directory -Path ./publish
-          Get-ChildItem -Recurse -Filter "*.exe" -Path "$env:PTG_PRODUCTION_APP_NAME/bin/Release" | ForEach-Object { Copy-Item $_.FullName -Destination "./publish" }
-          Get-ChildItem -Recurse -Filter "*.dll" -Path "$env:PTG_PRODUCTION_APP_NAME/bin/Release" | ForEach-Object { Copy-Item $_.FullName -Destination "./publish" }
+          Get-ChildItem -Recurse -Filter "*.exe" -Path $sourcePath | ForEach-Object { Copy-Item $_.FullName -Destination $publishPath }
+          Get-ChildItem -Recurse -Filter "*.dll" -Path $sourcePath | ForEach-Object { Copy-Item $_.FullName -Destination $publishPath }
           Get-ChildItem ./publish
 
       - name: Get Application Metadata
         run: |
-          $file = "$env:PTG_PRODUCTION_APP_NAME/Properties/AssemblyInfo.cs"
+          $root = "${{ env.root }}"
+          $file = if ($root) { Join-Path $root "Properties/AssemblyInfo.cs" } else { "Properties/AssemblyInfo.cs" }
+          
           $versionMatch = Select-String -Path $file -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+\.\d+)"\)'
           $titleMatch = Select-String -Path $file -Pattern 'AssemblyTitle\("(.+?)"\)'
           $productMatch = Select-String -Path $file -Pattern 'AssemblyProduct\("(.+?)"\)'
+          
           if ($versionMatch.Matches.Count -gt 0) {
             $version = $versionMatch.Matches[0].Groups[1].Value
             echo "APP_VERSION=$version" >> $env:GITHUB_ENV
@@ -61,6 +77,7 @@ jobs:
             echo "Error: Version not found!"
             exit 1
           }
+          
           if ($titleMatch.Matches.Count -gt 0) {
             $title = $titleMatch.Matches[0].Groups[1].Value
             echo "APP_TITLE=$title" >> $env:GITHUB_ENV
@@ -68,6 +85,7 @@ jobs:
             echo "Error: Title not found!"
             exit 1
           }
+          
           if ($productMatch.Matches.Count -gt 0) {
             $product = $productMatch.Matches[0].Groups[1].Value
             echo "APP_PRODUCT=$product" >> $env:GITHUB_ENV
