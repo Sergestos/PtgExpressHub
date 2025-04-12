@@ -44,7 +44,6 @@ public partial class Dashboard
         string applicationBlobUrl = _selectedApplicationVersions[application.ApplicationBuildId].BlobUrl;
 
         var downloadedData = await _storageService.DownloadFromStorage(applicationBlobUrl);
-
         if (downloadedData != null)
         {
             await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", application.ApplicationBuildUserName, "application/zip", downloadedData);
