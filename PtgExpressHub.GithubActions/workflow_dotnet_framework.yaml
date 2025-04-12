@@ -35,25 +35,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Set up NuGet
+        uses: NuGet/setup-nuget@v1
+
+      - name: Restore NuGet packages
+        run: nuget restore "$env:PTG_PRODUCTION_APP_NAME.sln"
+
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
         
       - name: Build Solution
         run: msbuild "$env:PTG_PRODUCTION_APP_NAME.sln" /p:Configuration=Release
 
-      - name: Determine root path
-        id: determine_root
-        run: |
-         if (Test-Path "./$env:PTG_PRODUCTION_APP_NAME") {
-          echo "root=$env:PTG_PRODUCTION_APP_NAME" >> $GITHUB_ENV
-         } else {
-          echo "root=" >> $GITHUB_ENV
-         }
-
       - name: Create new folder and copy .exe and .dll files
         run: |    
-          $root = "${{ env.root }}"
-          $sourcePath = if ($root) { Join-Path $root "bin/Release" } else { "bin/Release" }
+          $sourcePath = if (Test-Path "./$env:PTG_PRODUCTION_APP_NAME") { Join-Path $env:PTG_PRODUCTION_APP_NAME "/bin/Release" } else { "bin/Release" }
           $publishPath = "./publish"
           
           New-Item -ItemType Directory -Path ./publish
@@ -63,8 +59,7 @@ jobs:
 
       - name: Get Application Metadata
         run: |
-          $root = "${{ env.root }}"
-          $file = if ($root) { Join-Path $root "Properties/AssemblyInfo.cs" } else { "Properties/AssemblyInfo.cs" }
+          $file = if (Test-Path "./$env:PTG_PRODUCTION_APP_NAME") { Join-Path $env:PTG_PRODUCTION_APP_NAME "/Properties/AssemblyInfo.cs" } else { "Properties/AssemblyInfo.cs" }
           
           $versionMatch = Select-String -Path $file -Pattern 'AssemblyFileVersion\("(\d+\.\d+\.\d+\.\d+)"\)'
           $titleMatch = Select-String -Path $file -Pattern 'AssemblyTitle\("(.+?)"\)'
