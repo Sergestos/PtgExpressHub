@@ -24,7 +24,7 @@ public class Program
                 sqlOptions => sqlOptions.EnableRetryOnFailure()));
         
         builder.Services.AddScoped<AuthService>();
-        builder.Services.AddScoped<StorageDownloaderService>();
+        builder.Services.AddScoped<StorageService>();
         builder.Services.AddScoped<IApplicationRepository, ApplicationBuildRepository>();
         builder.Services.AddBlazoredLocalStorage();
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

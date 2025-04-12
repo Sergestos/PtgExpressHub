@@ -3,11 +3,11 @@ using System.IO.Compression;
 
 namespace PtgExpressHub.Web.Runtime;
 
-public class StorageDownloaderService
+public class StorageService
 {
     private readonly IConfiguration _configuration;
 
-    public StorageDownloaderService(IConfiguration configuration)
+    public StorageService(IConfiguration configuration)
     {
         _configuration = configuration;
     }
