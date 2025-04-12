@@ -1,3 +1,20 @@
+# Configure next GitHub Action secrets:
+# -- AZURE_CLIENT_ID:       application identity Id
+# -- AZURE_CLIENT_SECRET:   application identity password
+# -- AZURE_TENANT_ID:       application identity tenant
+# -- AZURE_STORAGE_KEY:     blob storage key
+# -- AZURE_STORAGE_ACCOUNT  blob storage account name
+# -- AZURE_STORAGE_NAME     blob storage directory
+# -- AZURE_FUNCTION_URL     function app url
+
+# Configure next csproj variables
+# -- AssemblyFileVersion:   represents app version. 
+#                           should change only major/ninor version
+#                           patch is autoincremented
+# -- AssemblyTitle:         application displayed name for users
+# -- AssemblyProduct        application working name
+#                           should match PTG_PRODUCTION_APP_NAME
+
 name: Build and Deploy to Azure Blob 
 
 env:
@@ -29,6 +46,9 @@ jobs:
       - name: Build Solution
         run: dotnet build "$env:PTG_PRODUCTION_APP_NAME.sln" --configuration Release --no-restore
 
+      # Clean non dll and exe files
+
+      # fix metadata fetch from appsettings file
       - name: Get Application Metadata
         run: |
           $file = "$env:PTG_PRODUCTION_APP_NAME/Properties/AssemblyInfo.cs"
@@ -79,7 +99,7 @@ jobs:
                 --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} `
                 --account-key ${{ secrets.AZURE_STORAGE_KEY }} `
                 --destination ${{ secrets.AZURE_STORAGE_NAME }}/$folderName `
-                --source $env:PTG_PRODUCTION_APP_NAME/bin/Release 
+                --source $env:PTG_PRODUCTION_APP_NAME/bin/Release # change to ./publish
             $blobUrl = "https://${{ secrets.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/${{ secrets.AZURE_STORAGE_NAME }}/$folderName"
             echo "BLOB_URL=$blobUrl" >>  $env:GITHUB_ENV
             Write-Host "Upload Result: $result"

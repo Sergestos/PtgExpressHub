@@ -1,7 +1,25 @@
+# Configure next GitHub Action secrets:
+# -- AZURE_CLIENT_ID:       application identity Id
+# -- AZURE_CLIENT_SECRET:   application identity password
+# -- AZURE_TENANT_ID:       application identity tenant
+# -- AZURE_STORAGE_KEY:     blob storage key
+# -- AZURE_STORAGE_ACCOUNT  blob storage account name
+# -- AZURE_STORAGE_NAME     blob storage directory
+# -- AZURE_FUNCTION_URL     function app url
+
+# Configure next csproj variables
+# -- AssemblyFileVersion:   represents app version. 
+#                           should change only major/ninor version
+#                           patch is autoincremented
+# -- AssemblyTitle:         application displayed name for users
+# -- AssemblyProduct        application working name
+#                           should match PTG_PRODUCTION_APP_NAME
+
 name: Build and Deploy to Azure Blob 
 
 env:
   PTG_PRODUCTION_APP_NAME: _
+
 on:
   push:
     branches:
