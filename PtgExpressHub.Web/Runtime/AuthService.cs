@@ -39,9 +39,12 @@ public class AuthService
 
     public bool IsUserAuthenticated()
     {
-        if (_httpContextAccessor == null)
+        if (_httpContextAccessor == null || 
+            _httpContextAccessor!.HttpContext == null ||
+            _httpContextAccessor!.HttpContext!.User == null ||
+            _httpContextAccessor!.HttpContext!.User!.Identity == null)
             return false;
 
-        return _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+        return _httpContextAccessor.HttpContext!.User.Identity!.IsAuthenticated;
     }
 }
