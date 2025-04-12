@@ -50,7 +50,7 @@ public sealed class ApplicationBuildService : IApplicationBuildService
     private string IncrementVersion(string newVersion, string? lastVersion)
     {
         if (lastVersion == null)
-            return newVersion;
+            return BuildVersion.Parse(newVersion).ToString();
 
         BuildVersion lastBuildVersion = BuildVersion.Parse(lastVersion);
         BuildVersion newBuildVersion = BuildVersion.Parse(newVersion);

@@ -12,8 +12,8 @@
 #                           should change only major/ninor version
 #                           patch is autoincremented
 # -- AssemblyTitle:         application displayed name for users
-# -- AssemblyProduct        application working name
-#                           should match PTG_PRODUCTION_APP_NAME
+# -- AssemblyProduct:       application working name
+#                           preferable match PTG_PRODUCTION_APP_NAME
 
 name: Build and Deploy to Azure Blob 
 

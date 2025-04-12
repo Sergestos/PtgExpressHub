@@ -8,6 +8,8 @@ public class AuthService
     private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
+    public event Action<bool> OnAuthStateChanged;
+
     public AuthService(IConfiguration config, IHttpContextAccessor httpContextAccessor, AuthenticationStateProvider authenticationStateProvider)
     {
         _configuration = config;
@@ -29,11 +31,17 @@ public class AuthService
 
         await httpContext.SignInAsync(principal);
 
+        if (OnAuthStateChanged != null)
+            OnAuthStateChanged.Invoke(true);
+
         return true;
     }
 
     public async Task LogOutUserAsync(HttpContext httpContext)
     {
+        if (OnAuthStateChanged != null)
+            OnAuthStateChanged.Invoke(false);
+
         await httpContext.SignOutAsync();
     }
 

@@ -1,7 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 
 @inject AuthService _authService;
-@inject AuthenticationStateProvider _customAuthenticationStateProvider;
 @inject NavigationManager NavigationManager;
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
@@ -11,7 +10,7 @@
         <img class="header-base-image" src="/apps.png" />
         <p class="header-base-label">Ptg Express Hub</p>
     </div>    
-    @if (@_authService.IsUserAuthenticated())
+    @if (IsAuthorized)
     {
         <div class="header-user">
             <div class="header-user-social" style="display: none">
@@ -24,8 +23,20 @@
 </div>
 
 @code {
+    public bool IsAuthorized { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        IsAuthorized = _authService.IsUserAuthenticated();
+        _authService.OnAuthStateChanged += (isAuthorized) =>
+        {
+            IsAuthorized = isAuthorized;
+            StateHasChanged();
+        };
+    }
+
     public void OnClick(MouseEventArgs e)
     {
-        NavigationManager.NavigateTo("/auth/logout");
+        NavigationManager.NavigateTo("/auth/logout", true);
     }
 }

@@ -1,9 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 
 @inherits LayoutComponentBase
+
 @inject AuthService _authService
 
-@if (@IsAuthorized)
+@if (IsAuthorized)
 {
     <div class="">
         @Body
@@ -17,13 +18,15 @@ else
 }
 
 @code {
-    [CascadingParameter]
-    public HttpContext HttpContext { get; set; } = default!;
-
     public bool IsAuthorized { get; set; } = false;
 
     protected override void OnInitialized()
     {
-        IsAuthorized = _authService.IsUserAuthenticated();       
+        IsAuthorized = _authService.IsUserAuthenticated();
+        _authService.OnAuthStateChanged += (isAuthorized) =>
+        {
+            IsAuthorized = isAuthorized;
+            StateHasChanged();
+        };
     }
 }

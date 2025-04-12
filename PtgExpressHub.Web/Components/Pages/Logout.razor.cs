@@ -10,6 +10,6 @@ public partial class Logout
     protected async override Task OnInitializedAsync()
     {
         await _authService.LogOutUserAsync(HttpContext);
-        _navigation.NavigateTo("/auth/login");
+        _navigation.NavigateTo("/auth/login", true);
     }
 }
