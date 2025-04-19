@@ -13,13 +13,3 @@
     URL.revokeObjectURL(exportUrl);
     a.remove();
 }
-
-window.checkAndHideExitBtn = () => {
-    var currentUrl = window.location.pathname; 
-    if (currentUrl === '/auth/login') {  
-        var elements = document.getElementsByClassName('hide-mark');
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].style.display = 'none';
-        }
-    }
-};

@@ -9,39 +9,42 @@
     <div class="header-base">
         <img class="header-base-image" src="/apps.png" />
         <p class="header-base-label">Ptg Express Hub</p>
-    </div>      
-    @if (IsAuthorized) {
-        <div class="header-user">
-            <div class="header-user-social" style="display: none">
-                <p class="header-user-social-label">автор</p>
-                <img class="header-user-social-image" src="/telegram.png" />
-            </div>
-            <input type="button" value="Выйти" class="ptg-button header-user-logout hide-mark" @onclick="(e) => OnClick(e)" />
+    </div>          
+    <div class="header-user">
+        <div class="header-user-social" style="display: none">
+            <p class="header-user-social-label">автор</p>
+            <img class="header-user-social-image" src="/telegram.png" />
         </div>
-    }
-  
+        @if (IsAuthorized)
+        {
+            <input type="button" value="Выйти" class="ptg-button header-user-logout hide-mark" @onclick="(e) => OnClick(e)" />
+        }
+    </div>      
 </div>
 
 @code {
     public bool IsAuthorized { get; set; } = false;
 
-    protected async override Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         IsAuthorized = !NavigationManager.Uri.Contains("/auth/login");
 
-        await Task.Run(() => IsAuthorized = _authService.IsUserAuthenticated());
-        _authService.OnAuthStateChanged += async (isAuthorized) =>
-        {
-            await Task.Run(() =>
-            {
-                IsAuthorized = isAuthorized;
-                StateHasChanged();
-            });            
-        };
+        NavigationManager.LocationChanged += OnLocationChanged;
     }
 
     public void OnClick(MouseEventArgs e)
     {
         NavigationManager.NavigateTo("/auth/logout", true);
+    }
+
+    private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        IsAuthorized = !e.Location.Contains("/auth/login");
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
     }
 }

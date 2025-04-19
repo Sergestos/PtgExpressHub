@@ -21,11 +21,6 @@ public partial class Login
         }        
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await _jsRuntime.InvokeVoidAsync("checkAndHideExitBtn");        
-    }
-
     private async Task HandleLoginAsync()
     {
         var isAuthentificated = _authenticationService.LoginAsync(Credentials.Username!, Credentials.Password!, HttpContext).Result;

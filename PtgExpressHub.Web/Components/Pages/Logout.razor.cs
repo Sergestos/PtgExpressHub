@@ -13,9 +13,4 @@ public partial class Logout
         await _authService.LogOutUserAsync(HttpContext);
         _navigation.NavigateTo("/auth/login", true);
     }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await _jsRuntime.InvokeVoidAsync("checkAndHideExitBtn");
-    }
 }
