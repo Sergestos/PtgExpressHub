@@ -29,22 +29,15 @@
     {
         IsAuthorized = !NavigationManager.Uri.Contains("/auth/login");
 
-        NavigationManager.LocationChanged += OnLocationChanged;
+        _authService.OnAuthStateChanged += (e) =>
+        {
+            IsAuthorized = e;
+            StateHasChanged();
+        };
     }
 
     public void OnClick(MouseEventArgs e)
     {
         NavigationManager.NavigateTo("/auth/logout", true);
-    }
-
-    private void OnLocationChanged(object sender, LocationChangedEventArgs e)
-    {
-        IsAuthorized = !e.Location.Contains("/auth/login");
-        StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        NavigationManager.LocationChanged -= OnLocationChanged;
     }
 }
