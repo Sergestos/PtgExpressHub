@@ -13,3 +13,9 @@
     URL.revokeObjectURL(exportUrl);
     a.remove();
 }
+
+function copyTextToClipboard(text) {
+    navigator.clipboard.writeText(text)
+        .then()
+        .catch(err => console.error("Error copying text:", err));
+};

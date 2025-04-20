@@ -25,6 +25,7 @@ public class Program
                 sqlOptions => sqlOptions.EnableRetryOnFailure()));
         
         builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<SafeLinkService>();
         builder.Services.AddScoped<StorageService>();
         builder.Services.AddScoped<IApplicationRepository, ApplicationBuildRepository>();
         builder.Services.AddBlazoredLocalStorage();
@@ -33,7 +34,8 @@ public class Program
             {
                 options.Cookie.Name = "auth_token";
                 options.LoginPath = "/auth/login";
-                options.Cookie.MaxAge = TimeSpan.FromDays(3);
+                options.Cookie.MaxAge = TimeSpan.FromHours(
+                    int.Parse(builder.Configuration["Resourse:CookieExpiryHoursTime"]!));
             });
 
         builder.Services.AddAuthorization();

@@ -7,6 +7,7 @@ namespace PtgExpressHub.Web.Components.Pages;
 public partial class Dashboard
 {
     public bool IsLoading;
+    public bool IsShowCopied = false;
 
     private bool _isAuthenticated;
     private Dictionary<Guid, ApplicationBuildVersion> _selectedApplicationVersions = new();
@@ -69,6 +70,21 @@ public partial class Dashboard
                 .ToArray();
         }        
     }
+    public async Task GenerateDownloadLinkAsync(ApplicationBuild application)
+    {
+        string applicationBlobUrl = _selectedApplicationVersions[application.ApplicationBuildId].BlobUrl;
+        string safeLink =_safeLinkService.GenerateSafeLink(application.ApplicationBuildUserName, applicationBlobUrl);
+
+        await _jsRuntime.InvokeVoidAsync("copyTextToClipboard", safeLink);
+
+        IsShowCopied = true;
+        StateHasChanged();
+        await Task.Delay(5000);
+
+        StateHasChanged();
+        IsShowCopied = false;        
+    }
+
     public void NavigateToLink(ApplicationBuild application)
     {
         _navigationManager.NavigateTo(application.ApplicationRepositoryUrl);

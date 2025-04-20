@@ -8,7 +8,7 @@
 
 .app-card {
     width: 27.5rem;
-    margin-top: 2rem;
+    margin-top: 1rem;
 
     background-color: #ffffff;
     border-radius: 0.5rem;
@@ -28,6 +28,13 @@
     width: 24px;
     height: 24px;
     margin-right: 4px;
+    cursor: pointer;
+}
+
+.link-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
     cursor: pointer;
 }
 
@@ -135,4 +142,23 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+.copied-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4caf50;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: opacity 2s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.copied-message.show {
+    opacity: 1;
 }

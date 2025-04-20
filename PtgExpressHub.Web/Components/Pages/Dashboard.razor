@@ -9,6 +9,7 @@
 @inject IConfiguration _configuration;
 @inject AuthService _authService;
 @inject StorageService _storageService
+@inject SafeLinkService _safeLinkService;
 @inject NavigationManager _navigationManager
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
@@ -35,7 +36,10 @@ else
                 <div class="app-card">
                     <div class="header-user-name">
                         <p class="card-title">@application.ApplicationBuildUserName</p>
-                        <img class="github-icon" src="/github.png" @onclick="() => NavigateToLink(application)" />
+                        <div>
+                            <img class="link-icon" src="/link-solid.png" @onclick="async () => await GenerateDownloadLinkAsync(application)" />
+                            <img class="github-icon" src="/github.png" @onclick="() => NavigateToLink(application)" />
+                        </div>
                     </div>                   
                     <p>@application.ApplicationBuildProductionName</p>                    
                     <div class="version-block card-data-section">
@@ -64,5 +68,5 @@ else
             }
         }
     </div>
-
+    <div class="copied-message @(IsShowCopied ? "show" : "")">Ссылка скопирована</div>
 }
