@@ -36,7 +36,7 @@ public class SafeLinkService
         return string.Concat(uri, query);
     }
 
-    public SafeLinkData DecodeFromSaveLink(string safeLink) 
+    public SafeLinkData DecodeFromSaveLink(string safeLink)
     {
         return new SafeLinkData(DecryptSafeLinkData(safeLink));
     }
@@ -50,7 +50,8 @@ public class SafeLinkService
         using var encryptor = aes.CreateEncryptor();
         byte[] inputBytes = Encoding.UTF8.GetBytes(plainText);
         byte[] encrypted = encryptor.TransformFinalBlock(inputBytes, 0, inputBytes.Length);
-        return Convert.ToBase64String(encrypted);
+
+        return Convert.ToBase64String(encrypted).Replace('+', '-').Replace('/', '_').TrimEnd('=');
     }
 
     private string DecryptSafeLinkData(string base64)
@@ -59,11 +60,24 @@ public class SafeLinkService
         aes.Key = _enc_key;
         aes.IV = _enc_iv;
 
-        byte[] encrypted = Convert.FromBase64String(base64);
+        byte[] encrypted = Convert.FromBase64String(NormalizeBase64(base64));
 
         using var decryptor = aes.CreateDecryptor();
         byte[] decryptedBytes = decryptor.TransformFinalBlock(encrypted, 0, encrypted.Length);
         return Encoding.UTF8.GetString(decryptedBytes);
+    }
+
+    private string NormalizeBase64(string input)
+    {
+        string normalizedBase64 = input.Replace('-', '+').Replace('_', '/');
+        switch (normalizedBase64.Length % 4)
+        {
+            case 2: normalizedBase64 += "=="; break;
+            case 3: normalizedBase64 += "="; break;
+            case 1: throw new FormatException("Invalid Base64 string length.");
+        }
+
+        return normalizedBase64;
     }
 }
 
