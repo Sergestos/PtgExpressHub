@@ -66,6 +66,7 @@ public partial class Dashboard
             IsModalOpen = true;
             ChangeLogs = version.ChangeLog
                 .Split(';')
+                .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(x => x.Trim().Insert(0, " "))
                 .ToArray();
         }        
